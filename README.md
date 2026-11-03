@@ -12,6 +12,43 @@ This is a learning implementation, not a certified production system.
 
 ---
 
+## The business problem it solves
+
+Every retail store runs on a stream of time-pressured decisions that happen
+before the doors open. They are small individually, large in aggregate, and
+today they are made from gut and spreadsheets rather than from the data every
+POS and WMS already generates.
+
+**The daily questions a store manager faces:**
+
+- What goes on the front display today?
+- Which SKUs need to move between stores before they stock out or age out?
+- Which prices should slide down this week before margin bleeds further?
+- What's a realistic 7-day revenue target to steer the team toward?
+- Which aging items need a bundle vs. an outright markdown?
+
+**What goes wrong today:**
+
+- Fast movers understocked while slow movers age in back-rooms.
+- Blanket markdowns that erode margin unnecessarily.
+- Stale product mix on prime front-office real estate.
+- Inconsistent decisions across stores — no shared playbook.
+- Pricing and discount actions that are not reliably auditable for compliance.
+
+**Why it isn't a data problem.** POS, inventory, returns, and surveys already
+generate the signals. The gap is that nobody has time to synthesize
+*five signals × fifty SKUs × five stores* every morning — and when they do,
+no one can later prove why a markdown was approved.
+
+**What this platform is.** A decision assistant for that morning window: a
+prioritized daily action plan per store, grounded in evidence, bounded by
+guardrails, and gated by human approval. Every recommendation carries its
+reasoning, expected revenue and margin impact, required-approval flag, and a
+success KPI — so the manager acts with confidence and operations can audit
+later.
+
+---
+
 ## What it does
 
 For every store, the platform generates a prioritized daily action plan:
