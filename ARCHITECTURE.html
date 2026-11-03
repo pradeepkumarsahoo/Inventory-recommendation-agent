@@ -413,10 +413,16 @@
     <p class="lead">
       Single-file guide to the project: what it does, how it's built, how the
       agents decide, how data moves end to end, and how to run it locally.
-      Databricks (Bronze → Silver → Gold) feeds a Python Supervisor + six
-      specialist agents; every output passes NeMo-style guardrails; the C# API
-      serves the React dashboard; and consequential actions are gated by human
-      approval with an append-only audit trail.
+      Databricks (Bronze → Silver → Gold) feeds a <b style="color:var(--text)">LangChain-driven
+      Supervisor</b> plus six deterministic specialists and a new
+      <b style="color:var(--text)">IntelligentRetailAgent</b> that emits
+      Pydantic-validated structured output, selects tools dynamically, and
+      falls back safely on failure. Every output passes NeMo-style guardrails;
+      a quantitative optimization engine, baseline-vs-AI simulation, and a
+      golden-dataset evaluation harness score decision quality; the C# API
+      (via a FastAPI agents service) serves the React dashboard; and
+      consequential actions are gated by role-based HITL governance with an
+      append-only audit trail.
     </p>
     <p class="lead" style="margin-top:10px">
       <b style="color:var(--text)">Author:</b> Pradeep Sahoo
@@ -433,12 +439,21 @@
     <a href="#overview">4 · Project overview</a>
     <a href="#diagram">5 · Block diagram</a>
     <a href="#layers">6 · Each layer explained</a>
-    <a href="#decides">7 · How the agent decides</a>
-    <a href="#flow">8 · End-to-end flow</a>
-    <a href="#contract">9 · Action plan contract</a>
-    <a href="#trust">10 · Trust &amp; safety</a>
-    <a href="#scenarios">11 · Business scenarios</a>
-    <a href="#operate">12 · Quick start &amp; operate</a>
+    <a href="#intelligent">7 · Intelligent agent</a>
+    <a href="#optimization">8 · Inventory optimization</a>
+    <a href="#decides">9 · How the agent decides</a>
+    <a href="#flow">10 · End-to-end flow</a>
+    <a href="#contract">11 · Action plan contract</a>
+    <a href="#explain">12 · Explainability</a>
+    <a href="#governance">13 · HITL governance</a>
+    <a href="#simulation">14 · Impact simulation</a>
+    <a href="#evaluation">15 · Evaluation harness</a>
+    <a href="#observability">16 · Observability</a>
+    <a href="#security">17 · Security</a>
+    <a href="#trust">18 · Trust &amp; safety</a>
+    <a href="#scenarios">19 · Business scenarios</a>
+    <a href="#cicd">20 · CI/CD</a>
+    <a href="#operate">21 · Quick start &amp; operate</a>
   </nav>
 
   <!-- ============ 1. BUSINESS PROBLEM ============ -->
@@ -497,33 +512,37 @@
 
   <div class="grid3" style="margin-top:14px">
     <div class="box">
-      <h4>The seven layers</h4>
+      <h4>The nine layers</h4>
       <ul>
         <li>Source systems — POS · inventory · returns · surveys · trends</li>
         <li>Databricks Lakehouse — Bronze → Silver → Gold</li>
         <li>Tool boundary — <code>ToolRegistry</code> (typed, read-only)</li>
-        <li>Agentic AI — Supervisor + 6 specialists (deterministic by default)</li>
+        <li>Security guard — ACLs · PII mask · prompt-injection scan around every tool call</li>
+        <li>Agentic AI — LangChain Supervisor + 6 specialists + <code>IntelligentRetailAgent</code> + quantitative optimizer</li>
         <li>Guardrails — NeMo or local policy engine (fail-closed, audited)</li>
-        <li>ASP.NET Core Web API — Clean Architecture</li>
-        <li>Experience &amp; HITL — React UI, HTML report, human approvals</li>
+        <li>Decision augmentation — Explainability · Simulation · Evaluation</li>
+        <li>Agents service (FastAPI) → ASP.NET Core Web API — Clean Architecture</li>
+        <li>Experience &amp; HITL governance — React UI, HTML report, RBAC approvals with TTL + idempotency</li>
       </ul>
     </div>
     <div class="box">
-      <h4>Three cross-cutting invariants</h4>
+      <h4>Four cross-cutting invariants</h4>
       <ul>
         <li>Agents never touch the data store directly — only via <code>ToolRegistry</code>.</li>
         <li>No write path from the LLM — only C# executes, after a human approves.</li>
         <li>Append-only audit log — every decision reconstructible.</li>
+        <li>LLM shapes narrative + selects tools; the deterministic specialists own every number.</li>
       </ul>
     </div>
     <div class="box">
       <h4>Why this shape</h4>
       <ul>
         <li>Separation by decision domain — each specialist is testable and swappable.</li>
-        <li>Deterministic scoring with the LLM as narrative-only — reproducible, auditable, runs with no API key.</li>
-        <li>Typed read-only tool boundary — smallest possible blast radius for LLM mistakes.</li>
+        <li>Structured LLM output (Pydantic) with deterministic fallback — reproducible, auditable, runs offline.</li>
+        <li>Typed read-only tool boundary + ACL/PII/injection guard — smallest possible blast radius for LLM mistakes.</li>
         <li>C#-mediated write path — the service enforces invariants and owns the audit trail.</li>
-        <li>Closed feedback loop — realized KPIs feed back into Bronze, so next day's recommendations are measurable against yesterday's commitments.</li>
+        <li>Evaluation + simulation attached to every bundle — the system can measure its own decisions, not just produce them.</li>
+        <li>Closed feedback loop — realized KPIs feed back into Bronze on the next ingest.</li>
       </ul>
     </div>
   </div>
@@ -617,6 +636,87 @@
         <div><h5>Signal to revisit</h5><p>The two drift in what they show — a divergence would mean the report has become its own second source of truth.</p></div>
       </div>
     </div>
+
+    <div class="tradeoff">
+      <h4>10 · LangChain over a hand-rolled tool-calling loop</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Battle-tested retry · streaming · provider swapping · parsing-error recovery — all with one dependency instead of ~80 lines of code we'd have to maintain.</p></div>
+        <div><h5>Gave up</h5><p>A heavy top-level dependency and exposure to LangChain's API churn across versions.</p></div>
+        <div><h5>Signal to revisit</h5><p>LangChain breaks on a major version in a way we can't absorb — swap to the thin ReAct loop we already had.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>11 · Pydantic-validated structured output (AgentPlan) over free-form LLM text</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Deterministic parsing · one repair loop · drop-safe fallback · no downstream has to parse ambiguity.</p></div>
+        <div><h5>Gave up</h5><p>The LLM is slightly less expressive; one failed-and-repaired call costs ~2× LLM tokens.</p></div>
+        <div><h5>Signal to revisit</h5><p>Repair-rate climbs over ~5% — tighten the schema or switch model.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>12 · Retry/timeout/fallback at the tool layer (not just the LLM)</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Most agent failures come from flaky tools; a <code>CallRecord</code> trace rides on every bundle so ops can see which tool is the problem without full distributed tracing.</p></div>
+        <div><h5>Gave up</h5><p>~10% overhead from telemetry; opt-out via <code>RetryPolicy(max_attempts=1)</code>.</p></div>
+        <div><h5>Signal to revisit</h5><p>When OpenTelemetry is wired to a real backend, strip the local trace and lean on spans.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>13 · FastAPI agents service as the one HTTP contract between .NET and Python</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Connection pooling · observability hooks · single serialization boundary · the agent system is testable in isolation.</p></div>
+        <div><h5>Gave up</h5><p>One more process to run (one more Dockerfile, one more port). ~30 MB RAM overhead.</p></div>
+        <div><h5>Signal to revisit</h5><p>Latency floor becomes a problem — move to a shared in-process host or gRPC.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>14 · Golden-dataset evaluation over LLM-as-judge</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Frozen regression tripwire; precision/recall/F1 move with the code; catches drift at CI time.</p></div>
+        <div><h5>Gave up</h5><p>Humans must curate and maintain the dataset — it won't scale to every edge case.</p></div>
+        <div><h5>Signal to revisit</h5><p>Dataset coverage drops below ~70% of production patterns — layer in offline log replay.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>15 · SIMULATED label + open assumptions dictionary on every impact number</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Every "+8% revenue" claim ships with the coefficient that produced it — the assumptions are impossible to hide in a demo.</p></div>
+        <div><h5>Gave up</h5><p>Numbers look less bold next to a disclaimer; marketing may push back.</p></div>
+        <div><h5>Signal to revisit</h5><p>Only once we have validated A/B outcomes to replace the heuristics — then the disclaimer narrows, not disappears.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>16 · Governance in-memory for the learning scope, pluggable for production</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Clean interface · fast tests · zero infra · state machine + audit log + idempotency work today.</p></div>
+        <div><h5>Gave up</h5><p>No persistence across process restarts; cannot share state between replicas yet.</p></div>
+        <div><h5>Signal to revisit</h5><p>Governance outlives one process — back it with Postgres + outbox behind the existing interface.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>17 · Observability facade over hard OpenTelemetry dependency</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Agent code emits spans unconditionally; real OTel exports when enabled, in-memory sink in CI.</p></div>
+        <div><h5>Gave up</h5><p>The facade is one more abstraction; a reader has to look up <code>LocalTracer</code> before the real exporter.</p></div>
+        <div><h5>Signal to revisit</h5><p>If OTel becomes a hard prerequisite in deployment, drop the local sink.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>18 · Security as test suite, not just docs</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>ACL · PII mask · injection scan · tool authz enforced by code with 12 regression tests — a <code>security-design.md</code> can lie, a test suite can't.</p></div>
+        <div><h5>Gave up</h5><p>Patterns drift from real production attack lists; must be refreshed.</p></div>
+        <div><h5>Signal to revisit</h5><p>Red-team finds a bypass — add the pattern and the regression in the same PR.</p></div>
+      </div>
+    </div>
   </div>
 
   <!-- ============ 4. OVERVIEW ============ -->
@@ -667,29 +767,72 @@ tests/             <span class="cmt"># pytest-driven agents / guardrails / sampl
          stack runs with no cloud account.</p>
     </div>
     <div class="box">
-      <h4>Service</h4>
-      <p>C# / .NET 8 · Clean Architecture · FluentValidation · Serilog ·
-         Swagger · problem-details errors.</p>
+      <h4>Agentic AI</h4>
+      <p>Python · <b style="color:var(--text)">LangChain</b> (<code>langchain</code>, <code>langchain-core</code>)
+         Supervisor · 6 specialists · <code>IntelligentRetailAgent</code> (structured output,
+         retry/timeout, dynamic tool selection) · Pydantic v2 schemas · pluggable
+         LLM provider (Anthropic / OpenAI / offline fake).</p>
     </div>
     <div class="box">
-      <h4>Agents</h4>
-      <p>Python · Supervisor + 6 specialists · ToolRegistry contract ·
-         pluggable LLM provider with a deterministic default.</p>
+      <h4>Quantitative core</h4>
+      <p>Safety stock · reorder point · EOQ · stockout probability (normal
+         approximation) · proportional store-level allocation · exponential-
+         smoothing forecast. All deterministic, stdlib-only.</p>
+    </div>
+    <div class="box">
+      <h4>Service</h4>
+      <p>C# / .NET 8 Web API (Clean Architecture, FluentValidation, Serilog,
+         Swagger) in front of a <b style="color:var(--text)">FastAPI agents service</b>
+         (Uvicorn) — one HTTP contract between .NET and Python.</p>
     </div>
     <div class="box">
       <h4>Safety</h4>
       <p>NVIDIA NeMo Guardrails (optional) with a local policy engine
-         fallback that enforces the same contract.</p>
+         fallback. Plus a security layer: ACL · PII mask · prompt-injection
+         scan · tool authorization · secrets manager · audit log.</p>
+    </div>
+    <div class="box">
+      <h4>Decision quality</h4>
+      <p>Golden-dataset evaluation (precision / recall / F1) · forecast
+         error (WAPE / MAPE / bias) · business-constraint checks ·
+         false-positive detector · baseline-vs-AI simulation (SIMULATED).</p>
+    </div>
+    <div class="box">
+      <h4>Governance</h4>
+      <p>RBAC state machine (pending → approved → executed) · TTL expiry ·
+         idempotency keys · auto-escalation on margin / transfer thresholds ·
+         append-only audit entries per transition.</p>
+    </div>
+    <div class="box">
+      <h4>Observability</h4>
+      <p>OpenTelemetry-compatible tracer + metrics sink with a local
+         fallback for CI. Counters, histograms, span records for every
+         tool call, LLM round-trip, and recommendation outcome.</p>
     </div>
     <div class="box">
       <h4>Experience</h4>
       <p>React 18 + TypeScript + Vite · Recharts · 7-page dashboard ·
-         printable HTML report.</p>
+         printable HTML report. Every recommendation ships with an
+         <code>explainability</code> block (evidence refs with timestamps,
+         scoring breakdown, confidence rationale).</p>
+    </div>
+    <div class="box">
+      <h4>CI/CD</h4>
+      <p>GitHub Actions: Python (3.11 &amp; 3.12 matrix) · .NET 8 build/test ·
+         React build · docker-compose e2e smoke · soft-fail bandit +
+         pip-audit security scans.</p>
     </div>
     <div class="box">
       <h4>Tests</h4>
-      <p>pytest · 26 tests across agents, guardrails, and sample-data
-         generation. All passing in the reference build.</p>
+      <p>pytest · <b style="color:var(--text)">71 tests</b> — 45 new unit tests
+         (optimization, evaluation, governance, security, simulation,
+         explainability) plus the legacy 26 (agents, guardrails, sample data).</p>
+    </div>
+    <div class="box">
+      <h4>Local stack</h4>
+      <p>Docker Compose: <code>agents</code> (FastAPI, port 7071) →
+         <code>api</code> (.NET 8, port 5080) → <code>ui</code> (nginx + Vite
+         build, port 5173). One <code>docker compose up</code> to run everything.</p>
     </div>
   </div>
 
@@ -1094,8 +1237,83 @@ tests/             <span class="cmt"># pytest-driven agents / guardrails / sampl
 
   </div>
 
+  <!-- ============ INTELLIGENT AGENT ============ -->
+  <h2 id="intelligent"><span class="num">7</span>The intelligent agent — structured output + resilience</h2>
+  <p class="lead">
+    <code>IntelligentRetailAgent</code> is the upgraded agentic loop. It asks
+    the LLM to emit a Pydantic-validated <code>AgentPlan</code> JSON, validates
+    it against business rules, runs the planned tools under retry + timeout +
+    telemetry, and hands off to the deterministic specialists for the
+    authoritative numbers. On any failure, it falls back to a hard-coded safe
+    plan — the system never stalls on an LLM outage.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Structured output contract</h4>
+      <pre class="code" style="margin:0"><span class="cmt"># ai-agents/retail_agents/intelligent_agent.py</span>
+class AgentPlan(BaseModel):
+    intent: str
+    store_id: str
+    tool_calls: list[ToolCall] = Field(
+        default_factory=list, max_length=12)
+    expected_outputs: list[str] = []
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    fallback_strategy: str = "deterministic_specialists"</pre>
+    </div>
+    <div class="box">
+      <h4>Resilience primitives</h4>
+      <ul>
+        <li><code>RetryPolicy</code> — attempts, delay, timeout, backoff.</li>
+        <li><code>with_retry()</code> — threading-based timeout (works on Windows), exponential backoff, per-attempt <code>CallRecord</code>.</li>
+        <li>Repair loop — one shot at coaxing the LLM to re-emit valid JSON before falling back.</li>
+        <li>Call trace rides on every output bundle for post-hoc debugging.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Dynamic tool selection</h4>
+      <ul>
+        <li>LLM selects which of the 9 registered tools to call based on the user intent.</li>
+        <li>Plan is validated: unknown intents / tools / low confidence trigger fallback.</li>
+        <li>Capped at <code>max_iterations=6</code>, <code>tool_calls max_length=12</code> — runaway loops are impossible.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ OPTIMIZATION ============ -->
+  <h2 id="optimization"><span class="num">8</span>Quantitative inventory optimization</h2>
+  <p class="lead">
+    Moves the system from "recommend an action" to "optimize a decision"
+    with textbook inventory-theory formulas. All deterministic, all
+    stdlib-only, all auditable.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Core formulas</h4>
+      <pre class="code" style="margin:0">safety_stock = z(service_level) · σ_daily · √L
+reorder_point = μ_daily · L + safety_stock
+EOQ = √(2 · D_annual · K / (c · h))
+P(stockout) = ½ · erfc((on_hand − μ·L) / (σ·√L · √2))</pre>
+    </div>
+    <div class="box">
+      <h4>Blended demand forecast</h4>
+      <p>Exponential smoothing (α=0.3) blended 60/40 with the historical mean
+         — reduces lag versus pure smoothing while keeping explainability.
+         Day-of-week seasonality covered by the <code>seven_day_forecast</code>
+         baseline for 7-day targets.</p>
+    </div>
+    <div class="box">
+      <h4>Store-level allocation</h4>
+      <p>Proportional fair-share across stores by expected demand.
+         Floor-and-remainder step guarantees <code>Σ allocated == available</code>
+         (no rounding drift). Supplier MOQ/MaxOQ clamping via
+         <code>apply_supplier_constraints()</code>.</p>
+    </div>
+  </div>
+
   <!-- ============ 4. HOW THE AGENT DECIDES ============ -->
-  <h2 id="decides"><span class="num">7</span>How the agent decides</h2>
+  <h2 id="decides"><span class="num">9</span>How the agent decides</h2>
   <p class="lead">
     The Supervisor runs a deterministic, auditable pipeline. The LLM — when
     configured — only shapes narrative on top of the deterministic result; it
@@ -1181,7 +1399,7 @@ tests/             <span class="cmt"># pytest-driven agents / guardrails / sampl
   </div>
 
   <!-- ============ 5. END-TO-END FLOW ============ -->
-  <h2 id="flow"><span class="num">8</span>End-to-end flow — what happens on one run</h2>
+  <h2 id="flow"><span class="num">10</span>End-to-end flow — what happens on one run</h2>
   <p class="lead">
     A single call to <code>python -m retail_agents.supervisor S101</code> — or
     one <code>POST /api/stores/{id}/recommendations</code> — exercises the
@@ -1253,7 +1471,7 @@ tests/             <span class="cmt"># pytest-driven agents / guardrails / sampl
   </div>
 
   <!-- ============ 6. ACTION PLAN CONTRACT ============ -->
-  <h2 id="contract"><span class="num">9</span>Action plan — the manager's contract</h2>
+  <h2 id="contract"><span class="num">11</span>Action plan — the manager's contract</h2>
   <p class="lead">
     What <code>StoreExecutionAgent</code> emits for each row of the daily plan.
     Every field is required and every value is evidence-backed.
@@ -1277,8 +1495,276 @@ tests/             <span class="cmt"># pytest-driven agents / guardrails / sampl
     </tbody>
   </table>
 
+  <!-- ============ EXPLAINABILITY ============ -->
+  <h2 id="explain"><span class="num">12</span>Explainability — the five questions each recommendation answers</h2>
+  <p class="lead">
+    Every recommendation ships with an <code>explainability</code> block
+    answering: <b style="color:var(--text)">why</b>, <b style="color:var(--text)">what
+    evidence supports it</b>, <b style="color:var(--text)">what's the expected
+    impact</b>, <b style="color:var(--text)">what's the confidence</b>, and
+    <b style="color:var(--text)">what could go wrong</b>. A store manager can
+    read, challenge, or override it with full context.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Evidence references</h4>
+      <p>Each referenced metric lists its <code>source</code> (e.g.
+         <code>sales_90d</code>), <code>metric</code> (e.g.
+         <code>weekly_velocity</code>), <code>value</code>, and
+         <code>recorded_at</code> timestamp. A reviewer can replay any decision
+         against the data as it existed when the agent ran.</p>
+    </div>
+    <div class="box">
+      <h4>Scoring breakdown</h4>
+      <p>For FRONT_OFFICE actions, each of the five weighted components
+         (velocity · margin · demand · sentiment · availability) is listed
+         with its weight and raw value. The composite score is never a
+         black box.</p>
+    </div>
+    <div class="box">
+      <h4>Confidence rationale</h4>
+      <p>Narrative sentence derived from the numeric confidence plus the
+         count of named risks: <i>"high confidence — multiple strong signals
+         align; 2 named risks tracked"</i>. No bare numbers without context.</p>
+    </div>
+  </div>
+
+  <!-- ============ GOVERNANCE ============ -->
+  <h2 id="governance"><span class="num">13</span>Human-in-the-loop governance workflow</h2>
+  <p class="lead">
+    The approval workflow extends the recommendation lifecycle with RBAC, a
+    state machine, idempotency, TTL expiry, and auto-escalation on impact
+    thresholds. Every state transition writes an audit entry.
+  </p>
+
+  <div class="decision">
+    <div class="pipe">
+      <div class="stage" style="--stage-color: var(--c-agent)">
+        <div class="icon">1</div><div class="t">Intake</div>
+        <div class="d">Role routed by action + impact</div>
+      </div>
+      <div class="arrow">›</div>
+      <div class="stage" style="--stage-color: var(--c-human)">
+        <div class="icon">2</div><div class="t">Pending</div>
+        <div class="d">TTL 24h · idempotency key</div>
+      </div>
+      <div class="arrow">›</div>
+      <div class="stage" style="--stage-color: var(--c-ok, var(--ok))">
+        <div class="icon">3</div><div class="t">Approved</div>
+        <div class="d">RBAC check passed</div>
+      </div>
+      <div class="arrow">›</div>
+      <div class="stage" style="--stage-color: var(--c-api)">
+        <div class="icon">4</div><div class="t">Executed</div>
+        <div class="d">Idempotent · audited</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Role-based permissions</h4>
+      <ul>
+        <li><b>Store Manager</b> — FRONT_OFFICE, REPLENISH.</li>
+        <li><b>Regional Manager</b> — TRANSFER, MARKDOWN, AGING_REVIEW, FRONT_OFFICE (override).</li>
+        <li><b>Finance Approver</b> — PRICING, MARKDOWN.</li>
+        <li><b>Auditor</b> — read-only.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Auto-escalation thresholds</h4>
+      <ul>
+        <li>|Expected margin impact| ≥ $500 → Regional.</li>
+        <li>Price change ≥ 10% → Finance.</li>
+        <li>Transfer units ≥ 100 → Regional.</li>
+        <li>Any MARKDOWN or PRICING → Finance / Regional.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Idempotency + TTL</h4>
+      <ul>
+        <li>Key = SHA-256 of <code>{rec_id, store, product, action, day}</code>.</li>
+        <li>Intake twice with same key = same governed record.</li>
+        <li>Execute twice = no-op (replayable safely).</li>
+        <li>Pending for &gt; 24 h → auto-expired.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ SIMULATION ============ -->
+  <h2 id="simulation"><span class="num">14</span>Business impact simulation — baseline vs AI</h2>
+  <p class="lead">
+    <b style="color:var(--text)">SIMULATED</b> — not actual outcomes. Compares
+    a do-nothing week against the week the AI-recommended plan is executed,
+    using an open dictionary of planning heuristics so every claim is
+    auditable. The disclaimer and the <code>assumptions</code> dict ride on
+    every output.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Metrics compared</h4>
+      <ul>
+        <li>Revenue + revenue Δ%</li>
+        <li>Gross profit + margin pp Δ</li>
+        <li>Units sold / stockouts / aged units remaining</li>
+        <li>Carrying cost (annual rate × leftover units / 52)</li>
+        <li>Net profit Δ, sell-through improvement %</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Planning heuristics (open)</h4>
+      <pre class="code" style="margin:0">ASSUMPTIONS = {
+  "front_office_uplift_pct":     0.18,
+  "markdown_sell_through_pct":   0.65,
+  "markdown_margin_hit_pct":     0.15,
+  "transfer_execution_rate":     0.85,
+  "pricing_elasticity":         -1.1,
+  "carrying_cost_rate_annual":   0.25,
+  "stockout_margin_lost_pct":    0.80,
+}</pre>
+    </div>
+    <div class="box">
+      <h4>Why open assumptions matter</h4>
+      <p>Executive dashboards often hide the coefficients behind a dramatic
+         percentage. Here every coefficient is listed with the output. A
+         reviewer can swap any value and re-run; the disclaimer tells them
+         the result is directional, not predictive.</p>
+    </div>
+  </div>
+
+  <!-- ============ EVALUATION ============ -->
+  <h2 id="evaluation"><span class="num">15</span>Evaluation harness — can we trust the agent?</h2>
+  <p class="lead">
+    A regression tripwire for recommendation quality. Hand-labelled golden
+    scenarios + forecast ground-truth + business-constraint checks + a
+    false-positive detector. Runs in CI so drift is caught at PR time.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Golden scenarios</h4>
+      <p>Hand-curated test cases: given this input state, this is what the
+         agent SHOULD recommend (expected_action_types) and SHOULD NOT
+         (forbidden_action_types). Precision / recall / F1 computed over hits
+         and forbidden emissions.</p>
+    </div>
+    <div class="box">
+      <h4>Forecast error</h4>
+      <ul>
+        <li><b>WAPE</b> — robust to zeros, bounded [0, ∞).</li>
+        <li><b>MAPE</b> — unstable near zero, kept for parity with legacy BI.</li>
+        <li><b>Bias</b> — mean (forecast − actual) / actual; positive = over-forecasting.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>False positive detector</h4>
+      <ul>
+        <li>Markdown on a fast mover (velocity ≥ 15/wk).</li>
+        <li>Feature a chronic returner (return rate &gt; 20%).</li>
+        <li>Transfer from a low-cover source (&lt; 2 weeks).</li>
+        <li>Price change on zero stock.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ OBSERVABILITY ============ -->
+  <h2 id="observability"><span class="num">16</span>Observability — tracer + metrics facade</h2>
+  <p class="lead">
+    OpenTelemetry-compatible façade that exports to the configured OTLP
+    endpoint when enabled and the SDK is installed, and falls back to an
+    in-memory <code>MetricsSink</code> suitable for CI assertions otherwise.
+    Every signal the agent system cares about is captured.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Spans</h4>
+      <p><code>tracer.span("supervisor.analyze", attrs)</code> around every
+         agent step. The in-memory sink records name, duration, status, and
+         attributes so tests can assert on them.</p>
+    </div>
+    <div class="box">
+      <h4>Counters &amp; histograms</h4>
+      <ul>
+        <li><code>tool_invocations_total{name,status}</code></li>
+        <li><code>tool_duration_ms{name}</code> (histogram)</li>
+        <li><code>llm_tokens_total{model,kind}</code></li>
+        <li><code>recommendation_outcomes_total{action,state}</code></li>
+        <li><code>agent_retries_total{tool}</code></li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Enablement</h4>
+      <pre class="code" style="margin:0"><span class="cmt"># Local / CI → in-memory sink</span>
+tracer = get_tracer("retail-agents")
+
+<span class="cmt"># Enable real OTel exporter</span>
+export RETAIL_OTEL_ENABLED=1
+<span class="cmt"># + install opentelemetry-sdk /</span>
+<span class="cmt">#   opentelemetry-exporter-otlp</span></pre>
+    </div>
+  </div>
+
+  <!-- ============ SECURITY ============ -->
+  <h2 id="security"><span class="num">17</span>Security &amp; data governance</h2>
+  <p class="lead">
+    Security as code, not documentation. Every tool call is wrapped by
+    <code>guarded_call()</code>: principal / ACL / tool authz check →
+    prompt-injection scan → invoke → PII mask on the result. Audit log
+    records every allow and deny.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>Row-level ACLs</h4>
+      <p><code>Principal(user_id, role, allowed_stores, allowed_tools)</code>.
+         Access to a <code>store_id</code> outside the principal's allow-list
+         is refused and audited. Tool-level authz works the same way.</p>
+    </div>
+    <div class="box">
+      <h4>PII masking</h4>
+      <ul>
+        <li><code>email</code> · <code>phone</code> · <code>ssn</code> ·
+            <code>card</code> · <code>customer_id</code></li>
+        <li>Recursive on dicts and lists — the LLM never sees cleartext PII.</li>
+        <li>Non-strings pass through unchanged.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Prompt-injection patterns</h4>
+      <ul>
+        <li><i>"ignore previous instructions"</i> family</li>
+        <li><i>"act as admin / developer / root"</i></li>
+        <li><i>"reveal your system prompt"</i></li>
+        <li>Chat-template tokens (<code>&lt;|im_start|&gt;</code> etc.)</li>
+        <li><i>"print the API key / secret / token"</i></li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Secrets handling</h4>
+      <p><code>SecretsManager</code> reads from env vars, requires non-empty
+         values, and the <code>mask_for_log()</code> helper masks anything with
+         an <code>API_KEY</code> / <code>SECRET</code> / <code>TOKEN</code> /
+         <code>PASSWORD</code> suffix before it reaches logs.</p>
+    </div>
+    <div class="box">
+      <h4>Tool authorization</h4>
+      <p>Every call runs through <code>authorize_tool_call(principal, name,
+         args)</code> — bundling ACL + tool allow-list + injection scan.
+         Returned PII is masked before leaving the call boundary.</p>
+    </div>
+    <div class="box">
+      <h4>Audit log</h4>
+      <p>Every allow/deny decision writes <code>{timestamp, actor, role,
+         action, resource, decision, reason}</code>. Separate from the
+         governance audit log; both are append-only.</p>
+    </div>
+  </div>
+
   <!-- ============ 7. TRUST ============ -->
-  <h2 id="trust"><span class="num">10</span>Trust &amp; safety boundaries</h2>
+  <h2 id="trust"><span class="num">18</span>Trust &amp; safety boundaries</h2>
   <div class="grid3">
     <div class="box">
       <h4>Agents can't touch data directly</h4>
@@ -1307,7 +1793,7 @@ tests/             <span class="cmt"># pytest-driven agents / guardrails / sampl
   </div>
 
   <!-- ============ 8. BUSINESS SCENARIOS ============ -->
-  <h2 id="scenarios"><span class="num">11</span>Business scenarios — what a store manager sees</h2>
+  <h2 id="scenarios"><span class="num">19</span>Business scenarios — what a store manager sees</h2>
   <p class="lead">
     Six concrete decisions the platform makes on a typical day, with the
     agent that produced them and a representative output.
@@ -1351,30 +1837,118 @@ tests/             <span class="cmt"># pytest-driven agents / guardrails / sampl
     </tbody>
   </table>
 
-  <!-- ============ 9. OPERATE / QUICK START ============ -->
-  <h2 id="operate"><span class="num">12</span>Quick start &amp; operate</h2>
+  <!-- ============ CI/CD ============ -->
+  <h2 id="cicd"><span class="num">20</span>CI / CD pipeline</h2>
   <p class="lead">
-    Run the whole stack locally. The Python half runs with no cloud account;
-    the C# API and React UI need .NET 8 and Node 20.
+    Four GitHub Actions workflows under <code>.github/workflows/</code> —
+    path-filtered so a UI-only PR doesn't spin up the Python matrix, and vice
+    versa.
   </p>
 
-  <h3 style="margin-top:18px">1. Generate deterministic sample data</h3>
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4><code>python.yml</code></h4>
+      <ul>
+        <li>Matrix: Python 3.11 &amp; 3.12.</li>
+        <li>Runs the 45 data-free unit tests (optimization, evaluation, governance, security, simulation + explainability).</li>
+        <li>Legacy data-dependent tests run only when sample CSVs are present.</li>
+        <li>Soft-fail ruff lint, bandit SAST, pip-audit dep scan.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4><code>dotnet.yml</code></h4>
+      <ul>
+        <li>.NET 8 restore / build / test on the full solution.</li>
+        <li>CI relaxes <code>TreatWarningsAsErrors</code> (strict locally).</li>
+        <li>Uploads TRX test results as an artifact.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4><code>ui.yml</code></h4>
+      <ul>
+        <li>Node 20; <code>npm install</code> (no lockfile committed yet).</li>
+        <li>Soft-fail lint / type-check / build / test / <code>npm audit</code>.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4><code>e2e-stack.yml</code></h4>
+      <ul>
+        <li>Manual dispatch — brings up <code>docker compose</code> all three services.</li>
+        <li>Health-polls <code>GET /health</code> on the .NET API before smoke call.</li>
+        <li>Dumps compose logs on failure; tears down on cleanup.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Security scanning</h4>
+      <ul>
+        <li>Bandit — Python static analysis.</li>
+        <li>pip-audit — Python dependency CVEs.</li>
+        <li><code>npm audit --audit-level=high</code> for the UI.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Caching</h4>
+      <ul>
+        <li>pip cache keyed on <code>ai-agents/requirements.txt</code>.</li>
+        <li>Default Node cache for subsequent runs.</li>
+        <li>Docker buildx GHA cache for compose builds (manual run).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ 9. OPERATE / QUICK START ============ -->
+  <h2 id="operate"><span class="num">21</span>Quick start &amp; operate</h2>
+  <p class="lead">
+    Run the whole stack locally. The Python half runs with no cloud account;
+    the C# API and React UI need .NET 8 and Node 20. The agents service is
+    containerized alongside them.
+  </p>
+
+  <h3 style="margin-top:18px">1. One-command full stack (recommended)</h3>
+  <pre class="code">docker compose up --build
+<span class="cmt"># agents (FastAPI, port 7071) → api (.NET 8, port 5080) → ui (nginx+Vite, port 5173)
+# Each service has a healthcheck; `ui` waits for `api`, `api` waits for `agents`.</span></pre>
+
+  <h3 style="margin-top:18px">2. Generate deterministic sample data</h3>
   <pre class="code">python databricks/generate_sample_data.py
 <span class="cmt"># 50 products × 5 stores × 90 days → 17,369 sales / 250 inventory snapshots / 1,024 surveys</span></pre>
 
-  <h3 style="margin-top:18px">2. Produce the standalone HTML decision report</h3>
+  <h3 style="margin-top:18px">3. End-to-end agent run (no API, no UI)</h3>
+  <pre class="code"><span class="cmt"># Deterministic stdlib supervisor</span>
+PYTHONPATH=ai-agents python -m retail_agents.supervisor S101
+
+<span class="cmt"># LangChain-driven supervisor (narrative + tool-calling)</span>
+PYTHONPATH=ai-agents python -m retail_agents.langchain_supervisor S101
+
+<span class="cmt"># Full intelligent agent (structured output + resilience)</span>
+PYTHONPATH=ai-agents python -m retail_agents.intelligent_agent S101</pre>
+
+  <h3 style="margin-top:18px">4. Call the FastAPI agents service directly</h3>
+  <pre class="code">pip install -r ai-agents/requirements.txt
+pip install fastapi uvicorn
+PYTHONPATH=ai-agents python ai-agents/service.py
+<span class="cmt"># POST /recommendations/S101
+# POST /recommendations/S101/intelligent
+# POST /recommendations/S101/langchain
+# POST /simulation/S101        — baseline vs AI
+# POST /evaluation             — golden-dataset + WAPE/MAPE
+# GET  /metrics                — observability snapshot</span></pre>
+
+  <h3 style="margin-top:18px">5. LLM backend (optional)</h3>
+  <pre class="code">export RETAIL_LC_PROVIDER=anthropic    <span class="cmt"># or openai, or none for offline fake</span>
+export RETAIL_LC_MODEL=claude-opus-4-7
+export ANTHROPIC_API_KEY=sk-ant-...</pre>
+
+  <h3 style="margin-top:18px">6. Produce the standalone HTML decision report</h3>
   <pre class="code">python reports/generate_report.py S101
 <span class="cmt"># → reports/daily-store-decision-report.html (styled, 38 action cards)</span></pre>
 
-  <h3 style="margin-top:18px">3. End-to-end agent run (no API, no UI)</h3>
-  <pre class="code">PYTHONPATH=ai-agents python -m retail_agents.supervisor S101
-<span class="cmt"># Returns a RecommendationBundle JSON — agent trace, action plan, 38 recommendations.</span></pre>
+  <h3 style="margin-top:18px">7. Run the test suite</h3>
+  <pre class="code">PYTHONPATH=ai-agents python -m pytest
+<span class="cmt"># 71 tests — 45 new (optimization, evaluation, governance, security,
+#   simulation, explainability) + 26 legacy (agents, guardrails, sample data).</span></pre>
 
-  <h3 style="margin-top:18px">4. Run the test suite</h3>
-  <pre class="code">python -m pytest
-<span class="cmt"># 26/26 passing — agents, guardrails, sample data.</span></pre>
-
-  <h3 style="margin-top:18px">5. Boot the full stack</h3>
+  <h3 style="margin-top:18px">8. Manual pieces (if not using docker-compose)</h3>
   <pre class="code"><span class="cmt"># API</span>
 cd api &amp;&amp; dotnet run --project Retail.Api --urls http://localhost:5080
 
@@ -1406,17 +1980,17 @@ cd ui &amp;&amp; npm install &amp;&amp; npm run dev
     <div class="box">
       <h4>Verified during the reference build</h4>
       <ul>
-        <li><code>generate_sample_data.py</code> → deterministic dataset.</li>
-        <li><code>supervisor S101</code> → 38 recommendations.</li>
-        <li><code>generate_report.py S101</code> → styled HTML report.</li>
-        <li><code>pytest</code> → 26 / 26 passing.</li>
+        <li>45 new unit tests (optimization · evaluation · governance · security · simulation · explainability) → <b style="color:var(--text)">45 / 45 passing</b>.</li>
+        <li>LangChain modules import cleanly with graceful fallback when LangChain isn't installed.</li>
+        <li><code>docker-compose.yml</code> wires agents + api + ui with healthchecks and dependency order.</li>
+        <li>GitHub Actions: Python matrix, .NET 8 build/test, UI build, docker-compose e2e smoke, soft-fail security scans.</li>
       </ul>
     </div>
   </div>
 
   <footer>
     <div>Retail Intelligence &amp; Autonomous Store Decision Platform · Author: Pradeep Sahoo · Learning Implementation</div>
-    <div>Databricks · .NET 8 · Python · NVIDIA NeMo Guardrails · React 18 + TypeScript + Vite</div>
+    <div>Databricks · .NET 8 · Python · LangChain · Pydantic · FastAPI · NVIDIA NeMo Guardrails · React 18 + TypeScript + Vite · GitHub Actions</div>
   </footer>
 
 </div>
