@@ -1,0 +1,90 @@
+name: Python agents CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ai-agents/**"
+      - "ai-guardrails/**"
+      - "databricks/**"
+      - "reports/**"
+      - "tests/**"
+      - ".github/workflows/python.yml"
+  pull_request:
+    paths:
+      - "ai-agents/**"
+      - "ai-guardrails/**"
+      - "databricks/**"
+      - "reports/**"
+      - "tests/**"
+      - ".github/workflows/python.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ai-agents/requirements.txt
+          pip install -r ai-guardrails/requirements.txt || true
+          pip install pytest pytest-cov
+
+      - name: Generate sample data
+        run: python databricks/generate_sample_data.py
+
+      - name: Lint (ruff) — soft
+        continue-on-error: true
+        run: |
+          pip install ruff
+          ruff check ai-agents
+
+      - name: Run tests
+        env:
+          PYTHONPATH: ai-agents
+        run: |
+          python -m pytest tests ai-agents/tests ai-guardrails/tests \
+            --cov=ai-agents/retail_agents --cov-report=xml --cov-report=term
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: coverage.xml
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: pip-audit (dependency vulnerabilities)
+        run: |
+          pip install pip-audit
+          pip-audit -r ai-agents/requirements.txt --strict || true
+
+      - name: Bandit (static security)
+        run: |
+          pip install bandit
+          bandit -r ai-agents/retail_agents -q || true
+
+      - name: Trufflehog (secret scan)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified

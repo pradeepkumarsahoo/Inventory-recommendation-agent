@@ -1,0 +1,50 @@
+name: End-to-end stack
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compose-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate sample data
+        run: python databricks/generate_sample_data.py
+
+      - name: docker compose build
+        run: docker compose -f docker-compose.yml build
+
+      - name: docker compose up
+        run: docker compose -f docker-compose.yml up -d
+
+      - name: Wait for API
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:5080/health >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          echo "API never came up"; docker compose logs api; exit 1
+
+      - name: Smoke call — supervisor
+        run: |
+          curl -fsS -X POST http://localhost:5080/api/recommendations/S101 \
+            -H "Content-Type: application/json" \
+            -d '{"intent":"daily_game_plan"}' | tee out.json
+          test -s out.json
+
+      - name: Dump compose logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

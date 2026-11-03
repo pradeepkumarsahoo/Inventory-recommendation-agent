@@ -1,4 +1,28 @@
 services:
+  # Python agents HTTP service — thin FastAPI shell around the Supervisor.
+  # The .NET API fans out here instead of shelling into Python per request,
+  # so the stack has one well-defined inter-service contract.
+  agents:
+    build:
+      context: .
+      dockerfile: ai-agents/Dockerfile
+    environment:
+      - RETAIL_SAMPLE_DATA_DIR=/app/data
+      - RETAIL_LC_PROVIDER=${RETAIL_LC_PROVIDER:-none}
+      - RETAIL_LC_MODEL=${RETAIL_LC_MODEL:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PYTHONPATH=/app/ai-agents
+    volumes:
+      - ./databricks/sample-data:/app/data:ro
+    ports:
+      - "7071:7071"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:7071/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
   api:
     build:
       context: .
@@ -9,12 +33,16 @@ services:
       - Data__SampleDataPath=/app/data
       - Agent__PythonExecutable=python3
       - Agent__AgentRoot=/app/ai-agents
+      - Agent__ServiceUrl=http://agents:7071
     volumes:
       - ./databricks/sample-data:/app/data:ro
       - ./ai-agents:/app/ai-agents:ro
       - ./ai-guardrails:/app/ai-guardrails:ro
     ports:
       - "5080:5080"
+    depends_on:
+      agents:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:5080/health"]
       interval: 10s

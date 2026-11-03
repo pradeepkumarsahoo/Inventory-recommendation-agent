@@ -1,0 +1,64 @@
+name: .NET API CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - ".github/workflows/dotnet.yml"
+  pull_request:
+    paths:
+      - "api/**"
+      - ".github/workflows/dotnet.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        working-directory: api
+        run: dotnet restore Retail.sln
+
+      - name: Build (Release)
+        working-directory: api
+        run: dotnet build Retail.sln --configuration Release --no-restore
+
+      - name: Test
+        working-directory: api
+        run: dotnet test Retail.sln --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: api/**/TestResults/*.trx
+
+  docker-image:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: api/Dockerfile
+          push: false
+          tags: retail-api:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

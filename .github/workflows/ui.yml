@@ -1,0 +1,51 @@
+name: React UI CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui.yml"
+  pull_request:
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm test --if-present -- --run
+
+      - name: Build
+        run: npm run build
+
+      - name: npm audit
+        run: npm audit --audit-level=high || true
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-dist
+          path: ui/dist
