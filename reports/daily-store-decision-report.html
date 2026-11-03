@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Daily Store Decision Report — S103</title>
+<style>
+    :root {
+      --bg: #0b1020;
+      --surface: #11162b;
+      --surface-2: #19203a;
+      --accent: #4f8cff;
+      --accent-2: #7bffb2;
+      --warn: #ffb13d;
+      --danger: #ff6b7a;
+      --text: #e6ecff;
+      --muted: #9aa3c7;
+      --border: rgba(255,255,255,0.08);
+    }
+    :root:not([data-theme="dark"]) {
+      --bg: #f6f8ff;
+      --surface: #ffffff;
+      --surface-2: #f0f3fb;
+      --accent: #2f58cd;
+      --accent-2: #0d9b65;
+      --warn: #b47400;
+      --danger: #c62537;
+      --text: #0e1430;
+      --muted: #5a6487;
+      --border: rgba(14,20,48,0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0b1020; --surface:#11162b; --surface-2:#19203a; --accent:#4f8cff;
+        --accent-2:#7bffb2; --warn:#ffb13d; --danger:#ff6b7a; --text:#e6ecff;
+        --muted:#9aa3c7; --border:rgba(255,255,255,0.08);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 24px 16px; min-height: 100vh;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; }
+    header.top {
+      display: flex; flex-wrap: wrap; align-items: baseline;
+      justify-content: space-between; gap: 12px; margin-bottom: 20px;
+    }
+    header.top h1 { font-size: 26px; margin: 0; letter-spacing: -0.01em; }
+    .brand-sub { color: var(--muted); font-size: 13px; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .tiles {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px; margin-bottom: 24px;
+    }
+    .tile {
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 14px 16px; border-radius: 10px;
+    }
+    .t-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .t-value { font-size: 20px; font-weight: 600; margin-top: 4px; }
+    h2 { margin: 32px 0 12px; font-size: 20px; letter-spacing: -0.01em; }
+    .action-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 12px;
+    }
+    .action-card header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .action-card header h3 { margin: 0; font-size: 17px; font-weight: 600; }
+    .rank {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; background: var(--surface-2);
+      color: var(--muted); border-radius: 8px; font-weight: 600; font-size: 13px;
+    }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .p-high { background: color-mix(in srgb, var(--danger) 22%, transparent); color: var(--danger); }
+    .p-med  { background: color-mix(in srgb, var(--warn) 24%, transparent); color: var(--warn); }
+    .p-low  { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); }
+    .why {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap: 12px;
+    }
+    .block {
+      background: var(--surface-2); padding: 10px 12px; border-radius: 8px;
+    }
+    .block-h {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); margin-bottom: 4px;
+    }
+    details { margin-top: 10px; }
+    details summary {
+      cursor: pointer; color: var(--accent); font-size: 13px; padding: 6px 0;
+    }
+    ul.metrics, ul.risks { margin: 0; padding-left: 18px; }
+    ul.metrics li, ul.risks li { font-size: 13px; margin-bottom: 2px; color: var(--muted); }
+    table.pretty {
+      width: 100%; border-collapse: collapse; margin-top: 10px;
+      background: var(--surface); border-radius: 10px; overflow: hidden;
+    }
+    table.pretty th, table.pretty td {
+      padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    table.pretty th { background: var(--surface-2); color: var(--muted); font-weight: 600; }
+    footer {
+      margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 12px;
+    }
+    @media print {
+      body { background: white; color: #0b1020; }
+      .action-card, .tile, .block, table.pretty { break-inside: avoid; }
+      details > summary { display: none; }
+      details > * { display: block !important; }
+      header.top { page-break-after: avoid; }
+    }
+    </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Daily Store Decision Report</h1>
+      <div class="brand-sub">Retail Intelligence &amp; Autonomous Store Decision Platform · Author: Pradeep Sahoo · Learning Implementation</div>
+    </div>
+    <div class="meta">
+      <div><strong>Store:</strong> S103</div>
+      <div><strong>Generated:</strong> 2026-11-03T07:00:00</div>
+    </div>
+  </header>
+
+  <section class='tiles'><div class='tile'><div class='t-label'>Current 90-day revenue</div><div class='t-value'>$993,912</div></div><div class='tile'><div class='t-label'>Gross margin</div><div class='t-value'>37.98%</div></div><div class='tile'><div class='t-label'>Inventory value</div><div class='t-value'>$324,987</div></div><div class='tile'><div class='t-label'>Aging inventory (91d+)</div><div class='t-value'>$124,171</div></div><div class='tile'><div class='t-label'>Expected revenue uplift</div><div class='t-value'>$126,561</div></div><div class='tile'><div class='t-label'>Expected gross profit</div><div class='t-value'>$41,109</div></div><div class='tile'><div class='t-label'>High-priority actions</div><div class='t-value'>16</div></div><div class='tile'><div class='t-label'>Total actions</div><div class='t-value'>43</div></div></section>
+
+  <h2>What should the store do first?</h2>
+  <p class="meta">Top prioritized actions from the agent supervisor, each one grounded in the data it was derived from.</p>
+  
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#1</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Controlled markdown on Lumen Classic Cleanser (15%)</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>Age 180+, margin 47.5%; a 15% markdown clears capital while preserving positive margin.</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>store_manager</strong><br/>
+             Deadline: <strong>72h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$61,059</strong><br/>
+             Margin: <strong>$19,830</strong><br/>
+             KPI: Reduction in on-hand quantity within 14 days</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>aging bucket</strong>: 180+</li><li><strong>age days</strong>: 392</li><li><strong>on hand quantity</strong>: 240</li><li><strong>weekly velocity</strong>: 14.46</li><li><strong>weeks of cover</strong>: 16.6</li><li><strong>gross margin percent</strong>: 47.31</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Markdowns can set a lower reference price.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#2</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Controlled markdown on Ridgewalk Compact Water Bottle (15%)</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>Age 180+, margin 42.3%; a 15% markdown clears capital while preserving positive margin.</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>store_manager</strong><br/>
+             Deadline: <strong>72h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$19,222</strong><br/>
+             Margin: <strong>$5,246</strong><br/>
+             KPI: Reduction in on-hand quantity within 14 days</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>aging bucket</strong>: 180+</li><li><strong>age days</strong>: 361</li><li><strong>on hand quantity</strong>: 108</li><li><strong>weekly velocity</strong>: 6.92</li><li><strong>weeks of cover</strong>: 15.61</li><li><strong>gross margin percent</strong>: 41.8</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Markdowns can set a lower reference price.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#3</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Transfer 21× Kelso Studio Jacket from S104 to S103</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>S103 sells 9.2/wk with only 15 on hand (&lt;13 reorder); S104 holds 119 units at 7.3/wk (16.3 weeks of cover).</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>inventory_manager</strong><br/>
+             Deadline: <strong>48h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$6,599</strong><br/>
+             Margin: <strong>$3,251</strong><br/>
+             KPI: Destination stockout days after lead time</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>source store id</strong>: S104</li><li><strong>source on hand</strong>: 119</li><li><strong>source weekly velocity</strong>: 7.31</li><li><strong>destination on hand</strong>: 15</li><li><strong>destination weekly velocity</strong>: 9.23</li><li><strong>transfer quantity</strong>: 21</li><li><strong>distance km</strong>: 44.41</li><li><strong>transfer cost estimate</strong>: 40.53</li><li><strong>lead time days</strong>: 2</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Lead time exposes destination to short-term stockouts.</li><li>Transfer cost erodes margin if demand softens.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#4</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Controlled markdown on Boltbox Studio Puzzle (15%)</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>Age 180+, margin 44.7%; a 15% markdown clears capital while preserving positive margin.</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>store_manager</strong><br/>
+             Deadline: <strong>72h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$6,063</strong><br/>
+             Margin: <strong>$1,804</strong><br/>
+             KPI: Reduction in on-hand quantity within 14 days</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>aging bucket</strong>: 180+</li><li><strong>age days</strong>: 357</li><li><strong>on hand quantity</strong>: 22</li><li><strong>weekly velocity</strong>: 6.08</li><li><strong>weeks of cover</strong>: 3.62</li><li><strong>gross margin percent</strong>: 44.22</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Markdowns can set a lower reference price.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#5</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Transfer 14× Boltbox Compact Board Game from S104 to S103</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>S103 sells 6.1/wk with only 10 on hand (&lt;9 reorder); S104 holds 88 units at 5.3/wk (16.6 weeks of cover).</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>inventory_manager</strong><br/>
+             Deadline: <strong>48h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$3,565</strong><br/>
+             Margin: <strong>$1,632</strong><br/>
+             KPI: Destination stockout days after lead time</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>source store id</strong>: S104</li><li><strong>source on hand</strong>: 88</li><li><strong>source weekly velocity</strong>: 5.31</li><li><strong>destination on hand</strong>: 10</li><li><strong>destination weekly velocity</strong>: 6.08</li><li><strong>transfer quantity</strong>: 14</li><li><strong>distance km</strong>: 44.41</li><li><strong>transfer cost estimate</strong>: 27.02</li><li><strong>lead time days</strong>: 2</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Lead time exposes destination to short-term stockouts.</li><li>Transfer cost erodes margin if demand softens.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#6</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Controlled markdown on Boltbox Max Building Blocks (15%)</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>Age 180+, margin 41.7%; a 15% markdown clears capital while preserving positive margin.</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>store_manager</strong><br/>
+             Deadline: <strong>72h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$3,718</strong><br/>
+             Margin: <strong>$994</strong><br/>
+             KPI: Reduction in on-hand quantity within 14 days</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>aging bucket</strong>: 180+</li><li><strong>age days</strong>: 240</li><li><strong>on hand quantity</strong>: 68</li><li><strong>weekly velocity</strong>: 8.15</li><li><strong>weeks of cover</strong>: 8.34</li><li><strong>gross margin percent</strong>: 41.06</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Markdowns can set a lower reference price.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#7</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Transfer 28× Copperleaf Studio Blender from S104 to S103</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>S103 sells 14.0/wk with only 28 on hand (&lt;21 reorder); S104 holds 124 units at 7.5/wk (16.6 weeks of cover).</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>inventory_manager</strong><br/>
+             Deadline: <strong>48h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$2,437</strong><br/>
+             Margin: <strong>$963</strong><br/>
+             KPI: Destination stockout days after lead time</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>source store id</strong>: S104</li><li><strong>source on hand</strong>: 124</li><li><strong>source weekly velocity</strong>: 7.46</li><li><strong>destination on hand</strong>: 28</li><li><strong>destination weekly velocity</strong>: 14.0</li><li><strong>transfer quantity</strong>: 28</li><li><strong>distance km</strong>: 44.41</li><li><strong>transfer cost estimate</strong>: 54.04</li><li><strong>lead time days</strong>: 2</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Lead time exposes destination to short-term stockouts.</li><li>Transfer cost erodes margin if demand softens.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#8</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Transfer 32× North Trail Lite Hiking Boots from S102 to S103</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>S103 sells 17.0/wk with only 36 on hand (&lt;25 reorder); S102 holds 211 units at 12.6/wk (16.7 weeks of cover).</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>inventory_manager</strong><br/>
+             Deadline: <strong>48h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$2,119</strong><br/>
+             Margin: <strong>$878</strong><br/>
+             KPI: Destination stockout days after lead time</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>source store id</strong>: S102</li><li><strong>source on hand</strong>: 211</li><li><strong>source weekly velocity</strong>: 12.62</li><li><strong>destination on hand</strong>: 36</li><li><strong>destination weekly velocity</strong>: 17.0</li><li><strong>transfer quantity</strong>: 32</li><li><strong>distance km</strong>: 14.07</li><li><strong>transfer cost estimate</strong>: 32.64</li><li><strong>lead time days</strong>: 1</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Lead time exposes destination to short-term stockouts.</li><li>Transfer cost erodes margin if demand softens.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#9</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Controlled markdown on Copperleaf Studio Blender (15%)</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>Age 180+, margin 41.8%; a 15% markdown clears capital while preserving positive margin.</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>store_manager</strong><br/>
+             Deadline: <strong>72h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$2,071</strong><br/>
+             Margin: <strong>$554</strong><br/>
+             KPI: Reduction in on-hand quantity within 14 days</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>aging bucket</strong>: 180+</li><li><strong>age days</strong>: 284</li><li><strong>on hand quantity</strong>: 28</li><li><strong>weekly velocity</strong>: 14.0</li><li><strong>weeks of cover</strong>: 2.0</li><li><strong>gross margin percent</strong>: 40.98</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Markdowns can set a lower reference price.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#10</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Transfer 6× Ridgewalk Lite Hiking Boots from S101 to S103</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>S103 sells 2.6/wk with only 4 on hand (&lt;3 reorder); S101 holds 226 units at 13.7/wk (16.5 weeks of cover).</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>inventory_manager</strong><br/>
+             Deadline: <strong>48h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$929</strong><br/>
+             Margin: <strong>$335</strong><br/>
+             KPI: Destination stockout days after lead time</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>source store id</strong>: S101</li><li><strong>source on hand</strong>: 226</li><li><strong>source weekly velocity</strong>: 13.69</li><li><strong>destination on hand</strong>: 4</li><li><strong>destination weekly velocity</strong>: 2.62</li><li><strong>transfer quantity</strong>: 6</li><li><strong>distance km</strong>: 10.32</li><li><strong>transfer cost estimate</strong>: 5.46</li><li><strong>lead time days</strong>: 1</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Lead time exposes destination to short-term stockouts.</li><li>Transfer cost erodes margin if demand softens.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#11</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Transfer 19× Harvest Table Lite Pasta from S105 to S103</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>S103 sells 11.7/wk with only 27 on hand (&lt;17 reorder); S105 holds 59 units at 3.1/wk (18.7 weeks of cover).</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>inventory_manager</strong><br/>
+             Deadline: <strong>48h</strong><br/>
+             Approval: <strong>regional_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$2,612</strong><br/>
+             Margin: <strong>$307</strong><br/>
+             KPI: Destination stockout days after lead time</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>source store id</strong>: S105</li><li><strong>source on hand</strong>: 59</li><li><strong>source weekly velocity</strong>: 3.15</li><li><strong>destination on hand</strong>: 27</li><li><strong>destination weekly velocity</strong>: 11.69</li><li><strong>transfer quantity</strong>: 19</li><li><strong>distance km</strong>: 40.48</li><li><strong>transfer cost estimate</strong>: 34.39</li><li><strong>lead time days</strong>: 2</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Lead time exposes destination to short-term stockouts.</li><li>Transfer cost erodes margin if demand softens.</li></ul>
+      </details>
+    </article>
+    
+    <article class='action-card'>
+      <header>
+        <span class='rank'>#12</span>
+        <span class='badge p-high'>HIGH</span>
+        <h3>Feature Hearthline Studio Blender in the front display</h3>
+      </header>
+      <section class='why'>
+        <div class='block'>
+          <div class='block-h'>Why it matters</div>
+          <p>Composite retail score 0.7116: strong velocity (25.98/wk), margin 35.03%, demand signal 0.53, satisfaction 4/5.</p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Who &amp; when</div>
+          <p>Owner: <strong>store_manager</strong><br/>
+             Deadline: <strong>24h</strong><br/>
+             Approval: <strong>store_manager</strong></p>
+        </div>
+        <div class='block'>
+          <div class='block-h'>Expected impact</div>
+          <p>Revenue: <strong>$489</strong><br/>
+             Margin: <strong>$171</strong><br/>
+             KPI: 7-day weekly velocity vs pre-placement baseline</p>
+        </div>
+      </section>
+      <details>
+        <summary>Supporting evidence</summary>
+        <ul class='metrics'><li><strong>composite score</strong>: 0.7116</li><li><strong>weekly velocity</strong>: 25.98</li><li><strong>gross margin percent</strong>: 35.03</li><li><strong>demand signal</strong>: 0.53</li><li><strong>avg satisfaction</strong>: 4</li><li><strong>on hand quantity</strong>: 60</li><li><strong>return rate</strong>: 0.0</li><li><strong>rank</strong>: 1</li></ul>
+        <div class='block-h'>Risks</div>
+        <ul class='risks'><li>Uplift assumption is a planning heuristic, not a validated A/B result.</li><li>Trend signal can shift quickly — re-evaluate weekly.</li></ul>
+      </details>
+    </article>
+    
+
+  
+    <section class='targets'>
+      <h2>Sales Targets</h2>
+      <p>Trailing 7-day revenue $76,475; seasonal-naive baseline for next 7 days $76,972. A 5% stretch is in line with store performance and the actions the agents are also recommending.</p>
+      <table class='pretty'>
+        <thead><tr><th>Date</th><th>Baseline forecast</th><th>Recommended target</th></tr></thead>
+        <tbody><tr><td>2026-11-01</td><td>$12,371</td><td>$12,990</td></tr><tr><td>2026-11-02</td><td>$10,272</td><td>$10,786</td></tr><tr><td>2026-11-03</td><td>$9,991</td><td>$10,491</td></tr><tr><td>2026-11-04</td><td>$9,721</td><td>$10,207</td></tr><tr><td>2026-11-05</td><td>$11,112</td><td>$11,667</td></tr><tr><td>2026-11-06</td><td>$10,375</td><td>$10,893</td></tr><tr><td>2026-11-07</td><td>$13,130</td><td>$13,787</td></tr></tbody>
+      </table>
+    </section>
+    
+
+  <h2>Monitoring &amp; Risks</h2>
+  <ul>
+    <li>Monitor stockout days against the destination stores for every approved transfer.</li>
+    <li>Track realized vs projected gross profit for pricing changes; roll back after 14 days if below projection.</li>
+    <li>Investigate any product whose return rate exceeds 20% before promoting further.</li>
+    <li>Re-run the agent supervisor daily; recommendations are a 24-hour snapshot.</li>
+  </ul>
+
+  <footer>
+    <div>“An AI-powered retail decision intelligence learning implementation demonstrating how Databricks, C#, React, Agentic AI, and NVIDIA NeMo Guardrails can work together to transform retail data into measurable store business outcomes.”</div>
+    <div style="margin-top:4px;">Author: Pradeep Sahoo · Purpose: Learning Implementation · Not an officially certified production implementation.</div>
+  </footer>
+</div>
+</body>
+</html>

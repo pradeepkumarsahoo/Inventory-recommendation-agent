@@ -1,0 +1,6 @@
+# Core agent system — stdlib only.
+# Optional LLM providers (install if you want narrative generation):
+#   anthropic>=0.34.0
+#   openai>=1.40.0
+# Testing
+pytest>=7.4.0

@@ -1,0 +1,5 @@
+# Core guardrail service — stdlib only (local policy engine).
+# Install NeMo Guardrails to activate the hosted-model path:
+#   nemoguardrails>=0.9.0
+# Testing
+pytest>=7.4.0
