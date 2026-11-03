@@ -33,6 +33,31 @@ This is a learning implementation, not a certified production system.
 
 ---
 
+## Changes done so far
+
+Chronological delivery log (oldest first) — each row is one commit on `main`.
+
+| # | Change | Scope |
+|---|---|---|
+| 1 | **Initial inventory-recommendation agent codebase** | Stdlib supervisor + 6 specialist agents (`retail_intelligence`, `product_recommendation`, `inventory_optimization`, `pricing_optimization`, `sales_forecasting`, `store_execution`), guardrails service (NeMo config + local policy engine), full .NET 8 Clean Architecture API (Domain / Application / Infrastructure / Api / Tests), React 18 + Vite UI shell (7 pages), standalone HTML daily report, pytest integration suite. |
+| 2 | **Added Docker and README** | `docker-compose.yml`, top-level `README.md`, `pytest.ini`, `TODO.md`. |
+| 3 | **Design and architecture flow added** | `ARCHITECTURE.html` landing page. |
+| 4 | **Updated architecture flow with business problem** | Business-problem narrative baked into `ARCHITECTURE.html`. |
+| 5 | **README refresh (×2)** | Documentation polish on the top-level README. |
+| 6 | **LangChain integration for the agent** | `langchain_llm_provider.py`, `langchain_supervisor.py`, `langchain_tools.py`; requirements bumped; narrative LLM attached beside deterministic specialists. |
+| 7 | **Review-comment code additions** | Nine new agent modules — `intelligent_agent.py` (structured Pydantic `AgentPlan` + retry/timeout/fallback), `optimization.py` (safety stock, ROP, EOQ, stockout probability), `simulation.py` (baseline vs AI 7-day P&L), `evaluation.py` (golden-dataset precision/recall/F1 + WAPE/MAPE), `explainability.py`, `governance.py` (HITL state machine, RBAC, TTL, audit), `observability.py` (OTel facade + local fallback), `security.py` (ACL, PII masking, prompt-injection), FastAPI `service.py` + `ai-agents/Dockerfile`; five new test modules (45 passing); four GitHub Actions workflows (`python.yml`, `dotnet.yml`, `ui.yml`, `e2e-stack.yml`); `docker-compose.yml` extended with the FastAPI `agents` service. |
+| 8 | **CI workflows aligned to repo state** | `python.yml`, `dotnet.yml`, `ui.yml`, `e2e-stack.yml` corrected so path filters, matrix versions, and job steps match the actual tree. |
+| 9 | **Architecture page updated with LangChain + new capability layers** | `ARCHITECTURE.html` extended to show intelligent agent, optimization, simulation, evaluation, governance, observability, security layers. |
+
+Running totals after all changes:
+
+- **71 pytest tests** across agents, guardrails, optimization, evaluation, governance, security, simulation, explainability.
+- **3-service docker-compose stack** (agents + api + ui).
+- **4 CI workflows** with path-filtered triggers.
+- **9 read-only agent tools** behind one guarded call path.
+
+---
+
 ## Technologies used
 
 - **LangChain** (`langchain`, `langchain-core`) — tool-calling agent framework.
