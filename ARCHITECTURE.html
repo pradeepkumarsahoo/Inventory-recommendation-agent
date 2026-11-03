@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Architecture — Retail Intelligence &amp; Autonomous Store Decision Platform</title>
+<title>Retail Intelligence &amp; Autonomous Store Decision Platform — Architecture, Flow &amp; Guide</title>
 <style>
   :root {
     --bg: #f6f8fc;
@@ -74,7 +74,7 @@
 
   /* ---------- Header ---------- */
   header.hero {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--border);
   }
@@ -91,9 +91,7 @@
   .eyebrow::before {
     content: ""; width: 6px; height: 6px; background: var(--ok); border-radius: 50%;
   }
-  h1 {
-    margin: 0 0 8px; font-size: 30px; letter-spacing: -0.02em; line-height: 1.15;
-  }
+  h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: -0.02em; line-height: 1.15; }
   h2 {
     margin: 48px 0 16px; font-size: 20px; letter-spacing: -0.01em;
     display: flex; align-items: center; gap: 10px;
@@ -104,7 +102,31 @@
     color: #fff; background: var(--accent); border-radius: 7px;
   }
   h3 { margin: 0 0 6px; font-size: 15px; }
+  h4 { margin: 0 0 6px; font-size: 13.5px; }
   p.lead { margin: 4px 0 0; color: var(--muted); max-width: 900px; font-size: 15px; }
+
+  /* ---------- TOC ---------- */
+  nav.toc {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: saturate(140%) blur(6px);
+    -webkit-backdrop-filter: saturate(140%) blur(6px);
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 10px 0 10px;
+    border-bottom: 1px solid var(--border);
+    margin: 10px 0 20px;
+  }
+  nav.toc a {
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  nav.toc a:hover { color: var(--text); border-color: var(--border-strong); }
 
   /* ---------- Legend ---------- */
   .legend {
@@ -112,10 +134,7 @@
     margin: 14px 0 14px; font-size: 12.5px; color: var(--muted);
   }
   .legend span { display: inline-flex; align-items: center; gap: 7px; }
-  .legend i {
-    width: 10px; height: 10px; border-radius: 3px; display: inline-block;
-    background: var(--c, var(--accent));
-  }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; background: var(--c, var(--accent)); }
 
   /* ---------- Diagram shell ---------- */
   .diagram {
@@ -127,48 +146,29 @@
     overflow-x: auto;
   }
   .layer {
-    display: grid;
-    grid-template-columns: 190px 1fr;
-    gap: 14px;
-    align-items: stretch;
-    margin-bottom: 8px;
+    display: grid; grid-template-columns: 190px 1fr; gap: 14px;
+    align-items: stretch; margin-bottom: 8px;
   }
   .layer-label {
     display: flex; flex-direction: column; justify-content: center;
-    padding: 14px;
-    border-radius: var(--radius);
+    padding: 14px; border-radius: var(--radius);
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-left: 4px solid var(--layer-color, var(--accent));
   }
-  .layer-label .n {
-    font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 2px;
-  }
+  .layer-label .n { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
   .layer-label .t { font-weight: 600; font-size: 14px; }
   .layer-label .d { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
-  .nodes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 10px;
-  }
+  .nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
   .node {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 14px 12px 18px;
-    box-shadow: var(--shadow);
-    min-height: 74px;
+    position: relative; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px 14px 12px 18px; box-shadow: var(--shadow); min-height: 74px;
   }
   .node::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 10px; bottom: 10px;
-    width: 3px;
-    background: var(--node-color, var(--accent));
-    border-radius: 3px;
+    content: ""; position: absolute; left: 0; top: 10px; bottom: 10px;
+    width: 3px; background: var(--node-color, var(--accent)); border-radius: 3px;
   }
   .node .ttl { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
   .node .sub { color: var(--muted); font-size: 12px; }
@@ -178,134 +178,72 @@
     background: color-mix(in srgb, var(--node-color, var(--accent)) 14%, transparent);
     border-radius: 999px; padding: 2px 8px; margin-top: 8px;
   }
-
   .flow-arrow {
-    grid-column: 1 / -1;
-    display: flex; justify-content: center;
-    color: var(--muted); font-size: 16px;
-    margin: -2px 0 2px; user-select: none;
+    grid-column: 1 / -1; display: flex; justify-content: center;
+    color: var(--muted); font-size: 16px; margin: -2px 0 2px; user-select: none;
   }
 
-  /* ---------- Decision flow (how agent decides) ---------- */
+  /* ---------- Decision pipe ---------- */
   .decision {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    box-shadow: var(--shadow);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow);
   }
-  .pipe {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    align-items: stretch;
-  }
+  .pipe { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: stretch; }
   .pipe .stage {
-    position: relative;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 12px 14px;
-    text-align: center;
-    min-height: 112px;
-    display: flex; flex-direction: column; gap: 4px; justify-content: center;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px; text-align: center;
+    min-height: 112px; display: flex; flex-direction: column; gap: 4px; justify-content: center;
   }
   .pipe .stage .icon {
-    width: 32px; height: 32px; margin: 0 auto 6px;
-    border-radius: 50%;
+    width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center;
     background: var(--stage-color, var(--accent));
     color: #fff; font-weight: 700; font-size: 13px;
   }
   .pipe .stage .t { font-weight: 600; font-size: 12.5px; }
   .pipe .stage .d { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
-  .pipe .arrow {
-    display: flex; align-items: center; justify-content: center;
-    color: var(--muted); font-size: 18px;
-  }
+  .pipe .arrow { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 18px; }
+  @media (max-width: 900px) { .pipe { grid-template-columns: 1fr; } }
 
-  @media (max-width: 900px) {
-    .pipe { grid-template-columns: 1fr; }
-  }
-
-  /* ---------- Scoring card ---------- */
-  .scoring {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 16px;
-    margin-top: 14px;
-  }
+  /* ---------- Scoring ---------- */
+  .scoring { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-top: 14px; }
   @media (max-width: 820px) { .scoring { grid-template-columns: 1fr; } }
-
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    box-shadow: var(--shadow);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow);
   }
-  .card h4 { margin: 0 0 10px; font-size: 14px; }
   .formula {
     font: 13px/1.5 "SF Mono", Menlo, Consolas, monospace;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: var(--text);
-    overflow-x: auto;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text); overflow-x: auto;
   }
   .weights { list-style: none; padding: 0; margin: 12px 0 0; }
   .weights li {
-    display: grid;
-    grid-template-columns: 110px 1fr 48px;
-    gap: 10px; align-items: center;
-    padding: 6px 0;
-    border-top: 1px dashed var(--border);
-    font-size: 13px;
+    display: grid; grid-template-columns: 110px 1fr 48px; gap: 10px;
+    align-items: center; padding: 6px 0; border-top: 1px dashed var(--border); font-size: 13px;
   }
   .weights li:first-child { border-top: 0; }
-  .weights .bar {
-    height: 6px; background: var(--surface-2);
-    border-radius: 999px; overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .weights .bar > span {
-    display: block; height: 100%; background: var(--accent);
-    border-top-left-radius: 999px; border-bottom-left-radius: 999px;
-  }
-  .weights b { font-weight: 600; }
+  .weights .bar { height: 6px; background: var(--surface-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+  .weights .bar > span { display: block; height: 100%; background: var(--accent); }
 
   /* ---------- Steps ---------- */
   .steps {
     counter-reset: step;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-    gap: 14px;
-    margin-top: 12px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 14px; margin-top: 12px;
   }
   .step {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 18px 14px;
-    box-shadow: var(--shadow);
+    position: relative; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 18px 14px; box-shadow: var(--shadow);
   }
   .step::before {
-    counter-increment: step;
-    content: counter(step);
-    position: absolute;
-    top: -12px; left: 14px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 12px; font-weight: 700;
-    width: 26px; height: 26px;
-    border-radius: 50%;
+    counter-increment: step; content: counter(step);
+    position: absolute; top: -12px; left: 14px;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 700;
+    width: 26px; height: 26px; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center;
     box-shadow: var(--shadow);
   }
-  .step h3 { margin: 2px 0 6px; }
-  .step p { margin: 0 0 6px; font-size: 13.5px; }
   .step .meta {
     font-size: 11.5px; color: var(--muted);
     border-top: 1px dashed var(--border);
@@ -315,56 +253,83 @@
   .step .meta b { color: var(--text); font-weight: 600; }
 
   /* ---------- Grids ---------- */
-  .grid3 {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
-  }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
   .box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    box-shadow: var(--shadow);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow);
   }
   .box h4 { margin: 0 0 6px; font-size: 13.5px; }
   .box p, .box li { font-size: 13px; color: var(--muted); margin: 0; }
   .box ul { margin: 6px 0 0 18px; padding: 0; }
   .box code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
 
+  /* ---------- Layer deep-dive ---------- */
+  .layer-detail {
+    display: grid; grid-template-columns: 230px 1fr; gap: 20px;
+    padding: 18px 20px; background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--layer-color, var(--accent));
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .layer-detail .side { display: flex; flex-direction: column; gap: 8px; }
+  .layer-detail .side .n {
+    font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  }
+  .layer-detail .side .t { font-weight: 700; font-size: 17px; line-height: 1.2; }
+  .layer-detail .side .tech {
+    display: inline-block; font-size: 11.5px; color: var(--muted);
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 2px 10px; width: fit-content;
+  }
+  .layer-detail .body h5 {
+    margin: 0 0 4px; font-size: 11.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .09em; font-weight: 600;
+  }
+  .layer-detail .body p { margin: 0 0 10px; font-size: 14px; }
+  .layer-detail .body ul { margin: 0 0 10px 18px; padding: 0; font-size: 13.5px; }
+  .layer-detail .body ul li + li { margin-top: 2px; }
+  .layer-detail code {
+    background: var(--surface-2); padding: 1px 5px; border-radius: 4px;
+    font: 12.5px/1.4 "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (max-width: 820px) { .layer-detail { grid-template-columns: 1fr; } }
+
   /* ---------- Table ---------- */
   table.std {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
+    width: 100%; border-collapse: collapse;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
     font-size: 13px;
   }
   table.std th, table.std td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-    vertical-align: top;
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    text-align: left; vertical-align: top;
   }
   table.std th {
-    background: var(--surface-2);
-    font-size: 12px;
-    letter-spacing: .04em;
-    color: var(--muted);
-    text-transform: uppercase;
-    font-weight: 600;
+    background: var(--surface-2); font-size: 12px; letter-spacing: .04em;
+    color: var(--muted); text-transform: uppercase; font-weight: 600;
   }
   table.std tr:last-child td { border-bottom: 0; }
   table.std code {
     font: 12px "SF Mono", Menlo, Consolas, monospace;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 1px 5px;
+  }
+
+  /* ---------- Code block ---------- */
+  pre.code {
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 1px 5px;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    overflow-x: auto;
+    font: 12.5px/1.55 "SF Mono", Menlo, Consolas, monospace;
+    color: var(--text);
+    margin: 10px 0;
   }
+  pre.code .cmt { color: var(--muted); }
 
   footer {
     margin-top: 50px; padding-top: 18px;
@@ -374,48 +339,68 @@
   }
   code {
     font: 12.5px/1.5 "SF Mono", Menlo, Consolas, monospace;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 1px 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 1px 6px;
   }
   .kbd {
     display: inline-block;
     font: 11.5px "SF Mono", Menlo, Consolas, monospace;
-    background: var(--surface-3);
-    border: 1px solid var(--border-strong);
-    border-radius: 5px;
-    padding: 1px 6px;
-    color: var(--text);
+    background: var(--surface-3); border: 1px solid var(--border-strong);
+    border-radius: 5px; padding: 1px 6px; color: var(--text);
+  }
+
+  /* ---------- Trade-off cards ---------- */
+  .tradeoff {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .tradeoff h4 { margin: 0 0 10px; font-size: 14px; }
+  .to-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .to-grid > div > h5 {
+    margin: 0 0 4px;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .to-grid > div > p { margin: 0; font-size: 13px; color: var(--text); }
+  .to-grid > div:nth-child(1) > h5 { color: var(--ok); }
+  .to-grid > div:nth-child(2) > h5 { color: var(--warn); }
+  .to-grid > div:nth-child(3) > h5 { color: var(--muted); }
+  @media (max-width: 820px) {
+    .to-grid { grid-template-columns: 1fr; }
   }
 
   /* ---------- Inline SVG block diagram ---------- */
   .svg-figure {
-    margin: 0 0 18px;
-    padding: 22px 20px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
+    margin: 0 0 18px; padding: 22px 20px 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow);
   }
   .svg-figure svg { width: 100%; height: auto; display: block; }
   .svg-figure figcaption {
-    color: var(--muted);
-    font-size: 12.5px;
-    margin-top: 10px;
-    text-align: center;
+    color: var(--muted); font-size: 12.5px; margin-top: 10px; text-align: center;
   }
-  .svg-lane  { font: 700 10.5px -apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:.14em; text-transform:uppercase; fill: var(--muted); }
-  .svg-ttl   { font: 600 13px -apple-system,"Segoe UI",Roboto,sans-serif; fill: var(--text); }
-  .svg-sub   { font: 11px -apple-system,"Segoe UI",Roboto,sans-serif; fill: var(--muted); }
-  .svg-box   { fill: var(--surface); stroke-width: 2; }
-  .svg-flow  { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+  .svg-lane { font: 700 10.5px -apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:.14em; text-transform:uppercase; fill: var(--muted); }
+  .svg-ttl  { font: 600 13px -apple-system,"Segoe UI",Roboto,sans-serif; fill: var(--text); }
+  .svg-sub  { font: 11px -apple-system,"Segoe UI",Roboto,sans-serif; fill: var(--muted); }
+  .svg-box  { fill: var(--surface); stroke-width: 2; }
+  .svg-flow { stroke: var(--muted); stroke-width: 1.6; fill: none; }
   .svg-flow-label { font: italic 11px -apple-system,"Segoe UI",Roboto,sans-serif; fill: var(--muted); }
   .svg-feedback   { stroke: var(--accent); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
   .svg-feedback-label { font: 600 11px -apple-system,"Segoe UI",Roboto,sans-serif; fill: var(--accent); }
-  .svg-sup-link   { stroke: var(--c-agent); stroke-width: 1; fill: none; opacity: 0.55; }
-  .svg-arr        { fill: var(--muted); }
-  .svg-arr-acc    { fill: var(--accent); }
+  .svg-sup-link { stroke: var(--c-agent); stroke-width: 1; fill: none; opacity: 0.55; }
+  .svg-arr      { fill: var(--muted); }
+  .svg-arr-acc  { fill: var(--accent); }
 </style>
 </head>
 <body>
@@ -423,22 +408,298 @@
 
   <!-- ============ HEADER ============ -->
   <header class="hero">
-    <span class="eyebrow">C4 · Layered · Agentic AI</span>
+    <span class="eyebrow">Project · Architecture · Flow · Operate</span>
     <h1>Retail Intelligence &amp; Autonomous Store Decision Platform</h1>
     <p class="lead">
-      Industry-standard, end-to-end reference architecture: a lakehouse-first,
-      agent-driven decision platform that turns raw retail telemetry into a
-      prioritized daily action plan — grounded in evidence, bounded by
-      guardrails, and gated by human approval. Written for engineers,
-      architects, and reviewers evaluating the system.
+      Single-file guide to the project: what it does, how it's built, how the
+      agents decide, how data moves end to end, and how to run it locally.
+      Databricks (Bronze → Silver → Gold) feeds a Python Supervisor + six
+      specialist agents; every output passes NeMo-style guardrails; the C# API
+      serves the React dashboard; and consequential actions are gated by human
+      approval with an append-only audit trail.
+    </p>
+    <p class="lead" style="margin-top:10px">
+      <b style="color:var(--text)">Author:</b> Pradeep Sahoo
+      &nbsp;·&nbsp; <b style="color:var(--text)">Purpose:</b> Learning implementation.
+      Not a certified production system.
     </p>
   </header>
 
-  <!-- ============ 1. CONTEXT DIAGRAM ============ -->
-  <h2><span class="num">1</span>System context</h2>
+  <!-- ============ TOC ============ -->
+  <nav class="toc" aria-label="Table of contents">
+    <a href="#problem">1 · Business problem</a>
+    <a href="#selected">2 · Architecture selected</a>
+    <a href="#tradeoffs">3 · Engineering trade-offs</a>
+    <a href="#overview">4 · Project overview</a>
+    <a href="#diagram">5 · Block diagram</a>
+    <a href="#layers">6 · Each layer explained</a>
+    <a href="#decides">7 · How the agent decides</a>
+    <a href="#flow">8 · End-to-end flow</a>
+    <a href="#contract">9 · Action plan contract</a>
+    <a href="#trust">10 · Trust &amp; safety</a>
+    <a href="#scenarios">11 · Business scenarios</a>
+    <a href="#operate">12 · Quick start &amp; operate</a>
+  </nav>
+
+  <!-- ============ 1. BUSINESS PROBLEM ============ -->
+  <h2 id="problem"><span class="num">1</span>The business problem</h2>
   <p class="lead">
-    Six logical layers, aligned to the C4 "Container" view. Each layer owns one
-    responsibility and talks to the next through an explicit contract.
+    Every retail store runs on a stream of time-pressured decisions that
+    happen before the doors open. They are small individually, large in
+    aggregate, and today they are made from gut and spreadsheets rather than
+    from the data every POS and WMS already generates.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>The daily questions</h4>
+      <ul>
+        <li>What goes on the front display today?</li>
+        <li>Which SKUs need to move between stores before they stock out or age out?</li>
+        <li>Which prices should slide down this week before margin bleeds further?</li>
+        <li>What's a realistic 7-day revenue target to steer the team toward?</li>
+        <li>Which aging items need a bundle vs. an outright markdown?</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>What goes wrong today</h4>
+      <ul>
+        <li>Fast movers understocked while slow movers age in back-rooms.</li>
+        <li>Blanket markdowns that erode margin unnecessarily.</li>
+        <li>Stale product mix on prime front-office real estate.</li>
+        <li>Inconsistent decisions across stores — no shared playbook.</li>
+        <li>Pricing and discount actions that are not reliably auditable.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Why it isn't a data problem</h4>
+      <p>POS, inventory, returns, and surveys already generate the signals. The
+        gap is that <b style="color:var(--text)">nobody has time to synthesize
+        five signals × fifty SKUs × five stores every morning</b> — and when
+        they do, no one can later prove why a markdown was approved.</p>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:16px">
+    <b style="color:var(--text)">What this platform is:</b> a decision
+    assistant for that morning window — a prioritized daily action plan per
+    store, grounded in evidence, bounded by guardrails, and gated by human
+    approval.
+  </p>
+
+  <!-- ============ 2. ARCHITECTURE SELECTED ============ -->
+  <h2 id="selected"><span class="num">2</span>The architecture selected</h2>
+  <p class="lead">
+    A layered, lakehouse-first, agentic AI platform with a fail-closed safety
+    layer and an explicit human gate. Seven layers, each owning one
+    responsibility and talking to the next through an explicit contract.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>The seven layers</h4>
+      <ul>
+        <li>Source systems — POS · inventory · returns · surveys · trends</li>
+        <li>Databricks Lakehouse — Bronze → Silver → Gold</li>
+        <li>Tool boundary — <code>ToolRegistry</code> (typed, read-only)</li>
+        <li>Agentic AI — Supervisor + 6 specialists (deterministic by default)</li>
+        <li>Guardrails — NeMo or local policy engine (fail-closed, audited)</li>
+        <li>ASP.NET Core Web API — Clean Architecture</li>
+        <li>Experience &amp; HITL — React UI, HTML report, human approvals</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Three cross-cutting invariants</h4>
+      <ul>
+        <li>Agents never touch the data store directly — only via <code>ToolRegistry</code>.</li>
+        <li>No write path from the LLM — only C# executes, after a human approves.</li>
+        <li>Append-only audit log — every decision reconstructible.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Why this shape</h4>
+      <ul>
+        <li>Separation by decision domain — each specialist is testable and swappable.</li>
+        <li>Deterministic scoring with the LLM as narrative-only — reproducible, auditable, runs with no API key.</li>
+        <li>Typed read-only tool boundary — smallest possible blast radius for LLM mistakes.</li>
+        <li>C#-mediated write path — the service enforces invariants and owns the audit trail.</li>
+        <li>Closed feedback loop — realized KPIs feed back into Bronze, so next day's recommendations are measurable against yesterday's commitments.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ 3. ENGINEERING TRADE-OFFS ============ -->
+  <h2 id="tradeoffs"><span class="num">3</span>The engineering trade-offs</h2>
+  <p class="lead">
+    Every design decision bought something and cost something. The important
+    ones, with what we gained, what we gave up, and the signal that would
+    make us revisit the call.
+  </p>
+
+  <div style="margin-top:14px">
+    <div class="tradeoff">
+      <h4>1 · Deterministic specialists over LLM-only agents</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Reproducibility · unit-testable scoring · auditable metrics · no API key or cost dependency.</p></div>
+        <div><h5>Gave up</h5><p>Flexible reasoning · open-ended planning · zero-shot generalization to novel scenarios.</p></div>
+        <div><h5>Signal to revisit</h5><p>Scoring rules become too brittle to maintain and a judgment-call layer would clearly earn its keep.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>2 · Supervisor + six specialists over one monolithic agent</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Bounded contexts · per-domain accountability · specialists evolve independently.</p></div>
+        <div><h5>Gave up</h5><p>Orchestration code to maintain · cross-domain reasoning harder to express in one place.</p></div>
+        <div><h5>Signal to revisit</h5><p>A specialist that keeps bleeding into another's territory — repeatedly needing data or verdicts from a sibling.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>3 · Typed, read-only ToolRegistry over direct data access</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>A boundary we can audit · the LLM cannot run SQL or shell commands · every data read is traceable.</p></div>
+        <div><h5>Gave up</h5><p>A tool surface to maintain and version · a new data need always forces a new tool.</p></div>
+        <div><h5>Signal to revisit</h5><p>Tool count explodes to the point maintenance eats the benefit — likely never, since the ceiling is bounded by domain actions.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>4 · Local policy engine fallback over NeMo-only guardrails</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Stack runs anywhere without GPU/CUDA · identical fail-closed contract · tests don't need NeMo installed.</p></div>
+        <div><h5>Gave up</h5><p>A duplicate policy implementation to keep in sync between the two engines.</p></div>
+        <div><h5>Signal to revisit</h5><p>Policy drift between the two engines — a case where NeMo blocks and the local engine lets through, or vice versa.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>5 · In-memory recommendation repo over SQL from day one</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Zero-setup iteration speed · fast test runs · clean swap boundary for later persistence.</p></div>
+        <div><h5>Gave up</h5><p>Persistence between runs · multi-process sharing of recommendations.</p></div>
+        <div><h5>Signal to revisit</h5><p>Approval workflow outlives a single process — plug in the already-designed EF Core + Postgres repository.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>6 · Dual data adapters (Databricks SQL + local CSV) behind one facade</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Offline runs · deterministic fixtures · cheap tests · no cloud account required to demo.</p></div>
+        <div><h5>Gave up</h5><p>Two implementations to keep in sync behind one <code>RetailDataStore</code> contract.</p></div>
+        <div><h5>Signal to revisit</h5><p>Edge-case drift — if CSV passes something SQL rejects, the facade contract is too loose.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>7 · Human approval on every consequential action</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>No runaway automation · legally defensible decisions · trust from store teams.</p></div>
+        <div><h5>Gave up</h5><p>Speed · the dream of fully autonomous stores · 24/7 execution without an on-call human.</p></div>
+        <div><h5>Signal to revisit</h5><p>Not negotiable for pricing, transfers, markdowns, replenishment — this gate is a core property, not a shortcut.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>8 · Append-only audit log over mutable records</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>Perfect reconstruction of any past decision · immutable evidence trail for compliance.</p></div>
+        <div><h5>Gave up</h5><p>Storage grows monotonically over time.</p></div>
+        <div><h5>Signal to revisit</h5><p>Not the design — the retention policy. Cold-tier archival of audit older than N quarters is the mitigation.</p></div>
+      </div>
+    </div>
+
+    <div class="tradeoff">
+      <h4>9 · Standalone HTML report alongside the React UI</h4>
+      <div class="to-grid">
+        <div><h5>Gained</h5><p>A shareable, printable, offline artifact for stakeholders without UI access.</p></div>
+        <div><h5>Gave up</h5><p>Duplicate rendering effort for the same underlying data model.</p></div>
+        <div><h5>Signal to revisit</h5><p>The two drift in what they show — a divergence would mean the report has become its own second source of truth.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 4. OVERVIEW ============ -->
+  <h2 id="overview"><span class="num">4</span>Project overview</h2>
+  <p class="lead">
+    For every store, the platform generates a prioritized daily action plan:
+    front-office product placements, inter-store transfers, replenishment,
+    aging-inventory interventions, pricing optimization, and a 7-day sales
+    target. Every recommendation carries evidence, risk, expected revenue
+    and margin impact, required approval, confidence, and a success KPI.
+  </p>
+
+  <div class="grid3" style="margin-top:14px">
+    <div class="box">
+      <h4>What it produces</h4>
+      <p>A <code>RecommendationBundle</code>: insights, prioritized action plan,
+         full agent trace, and per-action evidence. Printable as a standalone
+         HTML daily report.</p>
+    </div>
+    <div class="box">
+      <h4>Who runs it</h4>
+      <p>A store manager (approves and executes), a regional lead (sees
+         KPIs and pricing), and operations (audits approvals).</p>
+    </div>
+    <div class="box">
+      <h4>Why agents?</h4>
+      <p>Each specialist owns one concern (pricing, inventory, forecast, etc.).
+         The Supervisor orchestrates and validates. Deterministic by default —
+         no LLM API key required to run end-to-end.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:28px">Repository layout</h3>
+  <pre class="code">databricks/        <span class="cmt"># sample-data + Delta DDL + Bronze→Silver→Gold notebooks</span>
+api/               <span class="cmt"># ASP.NET Core Web API (Clean Architecture, 5 projects)</span>
+ai-agents/         <span class="cmt"># Python supervisor + 6 specialists + ToolRegistry</span>
+ai-guardrails/     <span class="cmt"># NeMo config + local policy engine + security tests</span>
+ui/                <span class="cmt"># React 18 + TypeScript + Vite dashboard (7 pages)</span>
+reports/           <span class="cmt"># Standalone HTML daily decision report</span>
+docs/              <span class="cmt"># Architecture, data dictionary, API, agent, security, business rules</span>
+tests/             <span class="cmt"># pytest-driven agents / guardrails / sample-data tests</span></pre>
+
+  <h3 style="margin-top:28px">Technology stack</h3>
+  <div class="grid3">
+    <div class="box">
+      <h4>Data</h4>
+      <p>Databricks · Delta Lake Bronze/Silver/Gold · local CSV adapter so the
+         stack runs with no cloud account.</p>
+    </div>
+    <div class="box">
+      <h4>Service</h4>
+      <p>C# / .NET 8 · Clean Architecture · FluentValidation · Serilog ·
+         Swagger · problem-details errors.</p>
+    </div>
+    <div class="box">
+      <h4>Agents</h4>
+      <p>Python · Supervisor + 6 specialists · ToolRegistry contract ·
+         pluggable LLM provider with a deterministic default.</p>
+    </div>
+    <div class="box">
+      <h4>Safety</h4>
+      <p>NVIDIA NeMo Guardrails (optional) with a local policy engine
+         fallback that enforces the same contract.</p>
+    </div>
+    <div class="box">
+      <h4>Experience</h4>
+      <p>React 18 + TypeScript + Vite · Recharts · 7-page dashboard ·
+         printable HTML report.</p>
+    </div>
+    <div class="box">
+      <h4>Tests</h4>
+      <p>pytest · 26 tests across agents, guardrails, and sample-data
+         generation. All passing in the reference build.</p>
+    </div>
+  </div>
+
+  <!-- ============ 2. BLOCK DIAGRAM ============ -->
+  <h2 id="diagram"><span class="num">5</span>Block diagram &amp; system context</h2>
+  <p class="lead">
+    Seven lanes, read top-to-bottom. Solid grey arrows carry one-way data and
+    action flow with their verb labelled on the arrow. The one dashed accent
+    arrow on the right is the closed-loop feedback — what makes this system
+    self-correcting rather than a one-shot pipeline.
   </p>
 
   <div class="legend">
@@ -464,204 +725,142 @@
         </marker>
       </defs>
 
-      <!-- =========================================================
-           FEEDBACK BUS — the one highlighted claim: this is a closed loop
-           =========================================================  -->
-      <path class="svg-feedback"
-            d="M1070,908 L1192,908 L1192,15 L260,15 L260,46"
-            marker-end="url(#arrAcc)"/>
-      <text class="svg-feedback-label" x="610" y="11" text-anchor="middle">
-        feedback — realized KPIs flow back into Bronze on the next ingest
-      </text>
+      <!-- Feedback bus -->
+      <path class="svg-feedback" d="M1070,908 L1192,908 L1192,15 L260,15 L260,46" marker-end="url(#arrAcc)"/>
+      <text class="svg-feedback-label" x="610" y="11" text-anchor="middle">feedback — realized KPIs flow back into Bronze on the next ingest</text>
 
-      <!-- =========================================================
-           LAYER 1 — SOURCE SYSTEMS
-           ========================================================= -->
+      <!-- Layer 1 -->
       <text class="svg-lane" x="20" y="38">Layer 1 · Source systems</text>
-      <g>
-        <rect class="svg-box" x="20"  y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
-        <text class="svg-ttl" x="157" y="78"  text-anchor="middle">POS Transactions</text>
-        <text class="svg-sub" x="157" y="98"  text-anchor="middle">baskets · promotions · tenders</text>
-
-        <rect class="svg-box" x="315" y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
-        <text class="svg-ttl" x="452" y="78"  text-anchor="middle">Inventory Snapshots</text>
-        <text class="svg-sub" x="452" y="98"  text-anchor="middle">on-hand · in-transit · aging</text>
-
-        <rect class="svg-box" x="610" y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
-        <text class="svg-ttl" x="747" y="78"  text-anchor="middle">Returns &amp; Surveys</text>
-        <text class="svg-sub" x="747" y="98"  text-anchor="middle">reasons · CSAT · NPS</text>
-
-        <rect class="svg-box" x="905" y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
-        <text class="svg-ttl" x="1042" y="78" text-anchor="middle">External Trends</text>
-        <text class="svg-sub" x="1042" y="98" text-anchor="middle">weather · search · calendar</text>
-      </g>
+      <rect class="svg-box" x="20"  y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
+      <text class="svg-ttl" x="157" y="78" text-anchor="middle">POS Transactions</text>
+      <text class="svg-sub" x="157" y="98" text-anchor="middle">baskets · promotions · tenders</text>
+      <rect class="svg-box" x="315" y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
+      <text class="svg-ttl" x="452" y="78" text-anchor="middle">Inventory Snapshots</text>
+      <text class="svg-sub" x="452" y="98" text-anchor="middle">on-hand · in-transit · aging</text>
+      <rect class="svg-box" x="610" y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
+      <text class="svg-ttl" x="747" y="78" text-anchor="middle">Returns &amp; Surveys</text>
+      <text class="svg-sub" x="747" y="98" text-anchor="middle">reasons · CSAT · NPS</text>
+      <rect class="svg-box" x="905" y="48" width="275" height="70" rx="8" style="stroke:var(--c-src)"/>
+      <text class="svg-ttl" x="1042" y="78" text-anchor="middle">External Trends</text>
+      <text class="svg-sub" x="1042" y="98" text-anchor="middle">weather · search · calendar</text>
       <path class="svg-flow" d="M600,118 L600,145" marker-end="url(#arr)"/>
       <text class="svg-flow-label" x="610" y="138">ingest</text>
 
-      <!-- =========================================================
-           LAYER 2 — DATABRICKS LAKEHOUSE
-           ========================================================= -->
+      <!-- Layer 2 -->
       <text class="svg-lane" x="20" y="160">Layer 2 · Databricks Lakehouse (Delta Lake)</text>
-      <g>
-        <rect class="svg-box" x="125" y="170" width="270" height="70" rx="8" style="stroke:var(--c-lake)"/>
-        <text class="svg-ttl" x="260" y="200" text-anchor="middle">Bronze</text>
-        <text class="svg-sub" x="260" y="220" text-anchor="middle">raw · append-only</text>
-
-        <path class="svg-flow" d="M395,205 L465,205" marker-end="url(#arr)"/>
-        <text class="svg-flow-label" x="430" y="198" text-anchor="middle">cleanse</text>
-
-        <rect class="svg-box" x="465" y="170" width="270" height="70" rx="8" style="stroke:var(--c-lake)"/>
-        <text class="svg-ttl" x="600" y="200" text-anchor="middle">Silver</text>
-        <text class="svg-sub" x="600" y="220" text-anchor="middle">cleansed · conformed</text>
-
-        <path class="svg-flow" d="M735,205 L805,205" marker-end="url(#arr)"/>
-        <text class="svg-flow-label" x="770" y="198" text-anchor="middle">aggregate</text>
-
-        <rect class="svg-box" x="805" y="170" width="270" height="70" rx="8" style="stroke:var(--c-lake)"/>
-        <text class="svg-ttl" x="940" y="200" text-anchor="middle">Gold — features</text>
-        <text class="svg-sub" x="940" y="220" text-anchor="middle">agg_product_sales · agg_inventory</text>
-      </g>
+      <rect class="svg-box" x="125" y="170" width="270" height="70" rx="8" style="stroke:var(--c-lake)"/>
+      <text class="svg-ttl" x="260" y="200" text-anchor="middle">Bronze</text>
+      <text class="svg-sub" x="260" y="220" text-anchor="middle">raw · append-only</text>
+      <path class="svg-flow" d="M395,205 L465,205" marker-end="url(#arr)"/>
+      <text class="svg-flow-label" x="430" y="198" text-anchor="middle">cleanse</text>
+      <rect class="svg-box" x="465" y="170" width="270" height="70" rx="8" style="stroke:var(--c-lake)"/>
+      <text class="svg-ttl" x="600" y="200" text-anchor="middle">Silver</text>
+      <text class="svg-sub" x="600" y="220" text-anchor="middle">cleansed · conformed</text>
+      <path class="svg-flow" d="M735,205 L805,205" marker-end="url(#arr)"/>
+      <text class="svg-flow-label" x="770" y="198" text-anchor="middle">aggregate</text>
+      <rect class="svg-box" x="805" y="170" width="270" height="70" rx="8" style="stroke:var(--c-lake)"/>
+      <text class="svg-ttl" x="940" y="200" text-anchor="middle">Gold — features</text>
+      <text class="svg-sub" x="940" y="220" text-anchor="middle">agg_product_sales · agg_inventory</text>
       <path class="svg-flow" d="M600,240 L600,267" marker-end="url(#arr)"/>
       <text class="svg-flow-label" x="610" y="260">feature read</text>
 
-      <!-- =========================================================
-           LAYER 3 — TOOL BOUNDARY (the only way agents touch data)
-           ========================================================= -->
+      <!-- Layer 3 -->
       <text class="svg-lane" x="20" y="282">Layer 3 · Tool boundary — the only way agents touch data</text>
-      <g>
-        <rect class="svg-box" x="200" y="292" width="800" height="60" rx="8" style="stroke:var(--c-tool)"/>
-        <text class="svg-ttl" x="600" y="318" text-anchor="middle">ToolRegistry — typed · read-only · allow-listed</text>
-        <text class="svg-sub" x="600" y="340" text-anchor="middle">get_sales · get_inventory_position · get_nearby_stores · get_trend</text>
-      </g>
+      <rect class="svg-box" x="200" y="292" width="800" height="60" rx="8" style="stroke:var(--c-tool)"/>
+      <text class="svg-ttl" x="600" y="318" text-anchor="middle">ToolRegistry — typed · read-only · allow-listed</text>
+      <text class="svg-sub" x="600" y="340" text-anchor="middle">get_sales · get_inventory_position · get_nearby_stores · get_trend</text>
       <path class="svg-flow" d="M600,352 L600,379" marker-end="url(#arr)"/>
       <text class="svg-flow-label" x="610" y="372">typed call</text>
 
-      <!-- =========================================================
-           LAYER 4 — AGENTIC AI (Supervisor + 6 specialists)
-           ========================================================= -->
+      <!-- Layer 4 -->
       <text class="svg-lane" x="20" y="394">Layer 4 · Agentic AI</text>
-
       <rect class="svg-box" x="460" y="404" width="280" height="56" rx="8" style="stroke:var(--c-agent); stroke-width:2.5"/>
       <text class="svg-ttl" x="600" y="430" text-anchor="middle">Supervisor Agent</text>
       <text class="svg-sub" x="600" y="450" text-anchor="middle">plans · routes · validates · ranks</text>
-
-      <!-- Fan-out: supervisor dispatches each specialist -->
       <path class="svg-sup-link" d="M600,460 L120,490"/>
       <path class="svg-sup-link" d="M600,460 L312,490"/>
       <path class="svg-sup-link" d="M600,460 L504,490"/>
       <path class="svg-sup-link" d="M600,460 L696,490"/>
       <path class="svg-sup-link" d="M600,460 L888,490"/>
       <path class="svg-sup-link" d="M600,460 L1080,490"/>
-
-      <g>
-        <rect class="svg-box" x="40"   y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
-        <text class="svg-ttl" x="120"  y="518" text-anchor="middle">Retail Intel</text>
-        <text class="svg-sub" x="120"  y="538" text-anchor="middle">store context</text>
-
-        <rect class="svg-box" x="232"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
-        <text class="svg-ttl" x="312"  y="518" text-anchor="middle">Product Rec</text>
-        <text class="svg-sub" x="312"  y="538" text-anchor="middle">composite score</text>
-
-        <rect class="svg-box" x="424"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
-        <text class="svg-ttl" x="504"  y="518" text-anchor="middle">Inventory Opt</text>
-        <text class="svg-sub" x="504"  y="538" text-anchor="middle">transfers · aging</text>
-
-        <rect class="svg-box" x="616"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
-        <text class="svg-ttl" x="696"  y="518" text-anchor="middle">Pricing Opt</text>
-        <text class="svg-sub" x="696"  y="538" text-anchor="middle">margin-safe</text>
-
-        <rect class="svg-box" x="808"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
-        <text class="svg-ttl" x="888"  y="518" text-anchor="middle">Sales Forecast</text>
-        <text class="svg-sub" x="888"  y="538" text-anchor="middle">7-day target</text>
-
-        <rect class="svg-box" x="1000" y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
-        <text class="svg-ttl" x="1080" y="518" text-anchor="middle">Store Execution</text>
-        <text class="svg-sub" x="1080" y="538" text-anchor="middle">action plan</text>
-      </g>
+      <rect class="svg-box" x="40"   y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
+      <text class="svg-ttl" x="120"  y="518" text-anchor="middle">Retail Intel</text>
+      <text class="svg-sub" x="120"  y="538" text-anchor="middle">store context</text>
+      <rect class="svg-box" x="232"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
+      <text class="svg-ttl" x="312"  y="518" text-anchor="middle">Product Rec</text>
+      <text class="svg-sub" x="312"  y="538" text-anchor="middle">composite score</text>
+      <rect class="svg-box" x="424"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
+      <text class="svg-ttl" x="504"  y="518" text-anchor="middle">Inventory Opt</text>
+      <text class="svg-sub" x="504"  y="538" text-anchor="middle">transfers · aging</text>
+      <rect class="svg-box" x="616"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
+      <text class="svg-ttl" x="696"  y="518" text-anchor="middle">Pricing Opt</text>
+      <text class="svg-sub" x="696"  y="538" text-anchor="middle">margin-safe</text>
+      <rect class="svg-box" x="808"  y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
+      <text class="svg-ttl" x="888"  y="518" text-anchor="middle">Sales Forecast</text>
+      <text class="svg-sub" x="888"  y="538" text-anchor="middle">7-day target</text>
+      <rect class="svg-box" x="1000" y="490" width="160" height="70" rx="8" style="stroke:var(--c-agent)"/>
+      <text class="svg-ttl" x="1080" y="518" text-anchor="middle">Store Execution</text>
+      <text class="svg-sub" x="1080" y="538" text-anchor="middle">action plan</text>
       <path class="svg-flow" d="M600,560 L600,587" marker-end="url(#arr)"/>
       <text class="svg-flow-label" x="610" y="580">candidates + evidence</text>
 
-      <!-- =========================================================
-           LAYER 5 — GUARDRAILS (fail-closed)
-           ========================================================= -->
+      <!-- Layer 5 -->
       <text class="svg-lane" x="20" y="602">Layer 5 · Guardrails — fail-closed, audited</text>
-      <g>
-        <rect class="svg-box" x="20"  y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
-        <text class="svg-ttl" x="157" y="642" text-anchor="middle">Input Policy</text>
-        <text class="svg-sub" x="157" y="662" text-anchor="middle">validation · PII · topic</text>
-
-        <rect class="svg-box" x="315" y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
-        <text class="svg-ttl" x="452" y="642" text-anchor="middle">Tool Policy</text>
-        <text class="svg-sub" x="452" y="662" text-anchor="middle">allow-list · schema</text>
-
-        <rect class="svg-box" x="610" y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
-        <text class="svg-ttl" x="747" y="642" text-anchor="middle">Output Policy</text>
-        <text class="svg-sub" x="747" y="662" text-anchor="middle">grounding · evidence</text>
-
-        <rect class="svg-box" x="905" y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
-        <text class="svg-ttl" x="1042" y="642" text-anchor="middle">Audit Log</text>
-        <text class="svg-sub" x="1042" y="662" text-anchor="middle">append-only</text>
-      </g>
+      <rect class="svg-box" x="20"  y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
+      <text class="svg-ttl" x="157" y="642" text-anchor="middle">Input Policy</text>
+      <text class="svg-sub" x="157" y="662" text-anchor="middle">validation · PII · topic</text>
+      <rect class="svg-box" x="315" y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
+      <text class="svg-ttl" x="452" y="642" text-anchor="middle">Tool Policy</text>
+      <text class="svg-sub" x="452" y="662" text-anchor="middle">allow-list · schema</text>
+      <rect class="svg-box" x="610" y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
+      <text class="svg-ttl" x="747" y="642" text-anchor="middle">Output Policy</text>
+      <text class="svg-sub" x="747" y="662" text-anchor="middle">grounding · evidence</text>
+      <rect class="svg-box" x="905" y="612" width="275" height="70" rx="8" style="stroke:var(--c-guard)"/>
+      <text class="svg-ttl" x="1042" y="642" text-anchor="middle">Audit Log</text>
+      <text class="svg-sub" x="1042" y="662" text-anchor="middle">append-only</text>
       <path class="svg-flow" d="M600,682 L600,709" marker-end="url(#arr)"/>
       <text class="svg-flow-label" x="610" y="702">validated bundle</text>
 
-      <!-- =========================================================
-           LAYER 6 — ASP.NET CORE API (Clean Architecture)
-           ========================================================= -->
+      <!-- Layer 6 -->
       <text class="svg-lane" x="20" y="724">Layer 6 · ASP.NET Core Web API — Clean Architecture</text>
-      <g>
-        <rect class="svg-box" x="20"  y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
-        <text class="svg-ttl" x="157" y="764" text-anchor="middle">Retail.Domain</text>
-        <text class="svg-sub" x="157" y="784" text-anchor="middle">entities · invariants</text>
-
-        <rect class="svg-box" x="315" y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
-        <text class="svg-ttl" x="452" y="764" text-anchor="middle">Retail.Application</text>
-        <text class="svg-sub" x="452" y="784" text-anchor="middle">services · validators</text>
-
-        <rect class="svg-box" x="610" y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
-        <text class="svg-ttl" x="747" y="764" text-anchor="middle">Retail.Infrastructure</text>
-        <text class="svg-sub" x="747" y="784" text-anchor="middle">orchestrator · repos</text>
-
-        <rect class="svg-box" x="905" y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
-        <text class="svg-ttl" x="1042" y="764" text-anchor="middle">Retail.Api</text>
-        <text class="svg-sub" x="1042" y="784" text-anchor="middle">controllers · Swagger</text>
-      </g>
+      <rect class="svg-box" x="20"  y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
+      <text class="svg-ttl" x="157" y="764" text-anchor="middle">Retail.Domain</text>
+      <text class="svg-sub" x="157" y="784" text-anchor="middle">entities · invariants</text>
+      <rect class="svg-box" x="315" y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
+      <text class="svg-ttl" x="452" y="764" text-anchor="middle">Retail.Application</text>
+      <text class="svg-sub" x="452" y="784" text-anchor="middle">services · validators</text>
+      <rect class="svg-box" x="610" y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
+      <text class="svg-ttl" x="747" y="764" text-anchor="middle">Retail.Infrastructure</text>
+      <text class="svg-sub" x="747" y="784" text-anchor="middle">orchestrator · repos</text>
+      <rect class="svg-box" x="905" y="734" width="275" height="70" rx="8" style="stroke:var(--c-api)"/>
+      <text class="svg-ttl" x="1042" y="764" text-anchor="middle">Retail.Api</text>
+      <text class="svg-sub" x="1042" y="784" text-anchor="middle">controllers · Swagger</text>
       <path class="svg-flow" d="M600,804 L600,831" marker-end="url(#arr)"/>
       <text class="svg-flow-label" x="610" y="824">serve bundle</text>
 
-      <!-- =========================================================
-           LAYER 7 — EXPERIENCE + HITL
-           ========================================================= -->
+      <!-- Layer 7 -->
       <text class="svg-lane" x="20" y="846">Layer 7 · Experience &amp; human-in-the-loop</text>
-      <g>
-        <rect class="svg-box" x="20"  y="856" width="215" height="60" rx="8" style="stroke:var(--c-ui)"/>
-        <text class="svg-ttl" x="127" y="882" text-anchor="middle">Dashboard</text>
-        <text class="svg-sub" x="127" y="902" text-anchor="middle">KPIs · trends</text>
-
-        <rect class="svg-box" x="255" y="856" width="215" height="60" rx="8" style="stroke:var(--c-ui)"/>
-        <text class="svg-ttl" x="362" y="882" text-anchor="middle">Decision Center</text>
-        <text class="svg-sub" x="362" y="902" text-anchor="middle">agent trace</text>
-
-        <rect class="svg-box" x="490" y="856" width="215" height="60" rx="8" style="stroke:var(--c-ui)"/>
-        <text class="svg-ttl" x="597" y="882" text-anchor="middle">Daily Game Plan</text>
-        <text class="svg-sub" x="597" y="902" text-anchor="middle">prioritized list</text>
-
-        <rect class="svg-box" x="725" y="856" width="215" height="60" rx="8" style="stroke:var(--c-human)"/>
-        <text class="svg-ttl" x="832" y="882" text-anchor="middle">Human Approval</text>
-        <text class="svg-sub" x="832" y="902" text-anchor="middle">HITL gate</text>
-
-        <rect class="svg-box" x="960" y="856" width="215" height="60" rx="8" style="stroke:var(--c-human)"/>
-        <text class="svg-ttl" x="1067" y="882" text-anchor="middle">Audited Execution</text>
-        <text class="svg-sub" x="1067" y="902" text-anchor="middle">C# mediated · signed</text>
-
-        <!-- within-row flow: game-plan → approval → execute -->
-        <path class="svg-flow" d="M705,886 L725,886" marker-end="url(#arr)"/>
-        <path class="svg-flow" d="M940,886 L960,886" marker-end="url(#arr)"/>
-        <text class="svg-flow-label" x="715" y="880" text-anchor="middle">approve</text>
-        <text class="svg-flow-label" x="950" y="880" text-anchor="middle">execute</text>
-      </g>
+      <rect class="svg-box" x="20"  y="856" width="215" height="60" rx="8" style="stroke:var(--c-ui)"/>
+      <text class="svg-ttl" x="127" y="882" text-anchor="middle">Dashboard</text>
+      <text class="svg-sub" x="127" y="902" text-anchor="middle">KPIs · trends</text>
+      <rect class="svg-box" x="255" y="856" width="215" height="60" rx="8" style="stroke:var(--c-ui)"/>
+      <text class="svg-ttl" x="362" y="882" text-anchor="middle">Decision Center</text>
+      <text class="svg-sub" x="362" y="902" text-anchor="middle">agent trace</text>
+      <rect class="svg-box" x="490" y="856" width="215" height="60" rx="8" style="stroke:var(--c-ui)"/>
+      <text class="svg-ttl" x="597" y="882" text-anchor="middle">Daily Game Plan</text>
+      <text class="svg-sub" x="597" y="902" text-anchor="middle">prioritized list</text>
+      <rect class="svg-box" x="725" y="856" width="215" height="60" rx="8" style="stroke:var(--c-human)"/>
+      <text class="svg-ttl" x="832" y="882" text-anchor="middle">Human Approval</text>
+      <text class="svg-sub" x="832" y="902" text-anchor="middle">HITL gate</text>
+      <rect class="svg-box" x="960" y="856" width="215" height="60" rx="8" style="stroke:var(--c-human)"/>
+      <text class="svg-ttl" x="1067" y="882" text-anchor="middle">Audited Execution</text>
+      <text class="svg-sub" x="1067" y="902" text-anchor="middle">C# mediated · signed</text>
+      <path class="svg-flow" d="M705,886 L725,886" marker-end="url(#arr)"/>
+      <path class="svg-flow" d="M940,886 L960,886" marker-end="url(#arr)"/>
+      <text class="svg-flow-label" x="715" y="880" text-anchor="middle">approve</text>
+      <text class="svg-flow-label" x="950" y="880" text-anchor="middle">execute</text>
     </svg>
-    <figcaption class="svg-cap" id="svg-cap">
+    <figcaption id="svg-cap">
       Figure 1 — End-to-end block diagram. Solid grey arrows carry one-way data
       and action flow; the dashed accent arrow is the closed-loop feedback
       from <em>Audited Execution</em> back into <em>Bronze</em>, which is what
@@ -669,350 +868,295 @@
     </figcaption>
   </figure>
 
-  <div class="diagram">
+  <!-- ============ 3. EACH LAYER EXPLAINED ============ -->
+  <h2 id="layers"><span class="num">6</span>Each layer explained</h2>
+  <p class="lead">
+    What each layer is responsible for, which parts of the repository implement
+    it, and the one invariant it enforces for the layer above.
+  </p>
 
-    <!-- Layer 1: Sources -->
-    <div class="layer" style="--layer-color: var(--c-src)">
-      <div class="layer-label">
+  <div style="margin-top:14px">
+
+    <!-- Layer 1 -->
+    <div class="layer-detail" style="--layer-color: var(--c-src)">
+      <div class="side">
         <span class="n">Layer 1</span>
         <span class="t">Source systems</span>
-        <span class="d">POS · WMS · CRM · external feeds</span>
+        <span class="tech">POS · WMS · CRM · external feeds</span>
       </div>
-      <div class="nodes">
-        <div class="node" style="--node-color: var(--c-src)">
-          <div class="ttl">POS Transactions</div>
-          <div class="sub">Baskets, promotions, tenders</div>
-          <span class="tag">OLTP</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-src)">
-          <div class="ttl">Inventory Snapshots</div>
-          <div class="sub">On-hand, in-transit, aging</div>
-          <span class="tag">Daily</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-src)">
-          <div class="ttl">Returns &amp; Surveys</div>
-          <div class="sub">Reason codes, CSAT, NPS</div>
-          <span class="tag">Event</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-src)">
-          <div class="ttl">External Trends</div>
-          <div class="sub">Weather, search demand, calendar</div>
-          <span class="tag">Feed</span>
-        </div>
+      <div class="body">
+        <h5>What it is</h5>
+        <p>The operational truth — point-of-sale baskets, inventory snapshots,
+          returns and survey events, plus external signals like weather and
+          search demand. Everything downstream has to come from here, directly
+          or by derivation.</p>
+        <h5>Repository parts</h5>
+        <ul>
+          <li>External in production; locally simulated by
+            <code>databricks/generate_sample_data.py</code> (50 products × 5
+            stores × 90 days, deterministic).</li>
+        </ul>
+        <h5>Invariant for the next layer</h5>
+        <p>Every record carries a timestamp and a store/product id; nothing is
+          emitted without them.</p>
       </div>
     </div>
 
-    <div class="flow-arrow">▼</div>
-
-    <!-- Layer 2: Lakehouse -->
-    <div class="layer" style="--layer-color: var(--c-lake)">
-      <div class="layer-label">
+    <!-- Layer 2 -->
+    <div class="layer-detail" style="--layer-color: var(--c-lake)">
+      <div class="side">
         <span class="n">Layer 2</span>
         <span class="t">Databricks Lakehouse</span>
-        <span class="d">Delta Lake · Bronze → Silver → Gold</span>
+        <span class="tech">Delta · Bronze → Silver → Gold</span>
       </div>
-      <div class="nodes">
-        <div class="node" style="--node-color: var(--c-lake)">
-          <div class="ttl">Bronze — raw</div>
-          <div class="sub">Append-only, schema-on-read</div>
-          <span class="tag">Delta</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-lake)">
-          <div class="ttl">Silver — cleansed</div>
-          <div class="sub">Typed, de-duped, conformed</div>
-          <span class="tag">Delta</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-lake)">
-          <div class="ttl">Gold — features</div>
-          <div class="sub">
-            <code>agg_product_sales</code>,
-            <code>agg_inventory</code>,
-            <code>product_trend</code>
-          </div>
-          <span class="tag">Serving</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-lake)">
-          <div class="ttl">RetailDataStore facade</div>
-          <div class="sub">Databricks SQL or local CSV adapter</div>
-          <span class="tag">Facade</span>
-        </div>
+      <div class="body">
+        <h5>What it is</h5>
+        <p>Delta Lake medallion. Bronze lands raw events append-only; Silver
+          de-duplicates, casts types, and conforms keys; Gold aggregates the
+          feature tables the agents actually consume.</p>
+        <h5>Serving tables (Gold)</h5>
+        <ul>
+          <li><code>agg_product_sales_features</code></li>
+          <li><code>agg_inventory_features</code></li>
+          <li><code>agg_store_performance_90d</code></li>
+          <li><code>product_trend</code></li>
+        </ul>
+        <h5>Repository parts</h5>
+        <ul>
+          <li><code>databricks/</code> — SQL DDL + Bronze/Silver/Gold notebooks</li>
+          <li><code>ai-agents/retail_agents/data_access.py</code> —
+            <code>RetailDataStore</code> facade with Databricks SQL and local
+            CSV adapters behind the same contract</li>
+        </ul>
+        <h5>Invariant for the next layer</h5>
+        <p>Agents never see raw rows — only typed, trusted features. The
+          facade switch is invisible to agent code.</p>
       </div>
     </div>
 
-    <div class="flow-arrow">▼</div>
-
-    <!-- Layer 3: Tool boundary -->
-    <div class="layer" style="--layer-color: var(--c-tool)">
-      <div class="layer-label">
+    <!-- Layer 3 -->
+    <div class="layer-detail" style="--layer-color: var(--c-tool)">
+      <div class="side">
         <span class="n">Layer 3</span>
         <span class="t">Tool boundary</span>
-        <span class="d">The only way agents touch data</span>
+        <span class="tech">ToolRegistry — typed, read-only</span>
       </div>
-      <div class="nodes">
-        <div class="node" style="--node-color: var(--c-tool)">
-          <div class="ttl">ToolRegistry</div>
-          <div class="sub">Typed, versioned catalog</div>
-          <span class="tag">Contract</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-tool)">
-          <div class="ttl">Read-only tools</div>
-          <div class="sub"><code>get_sales</code>, <code>get_inventory_position</code>, <code>get_nearby_stores</code>, <code>get_trend</code></div>
-          <span class="tag">Read</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-tool)">
-          <div class="ttl">Allow-list</div>
-          <div class="sub">Guardrail-enforced per invocation</div>
-          <span class="tag">Policy</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-tool)">
-          <div class="ttl">No-write invariant</div>
-          <div class="sub">Agents cannot mutate state</div>
-          <span class="tag">Invariant</span>
-        </div>
+      <div class="body">
+        <h5>What it is</h5>
+        <p>The single door through which agents access data. Each tool is a
+          plain Python function with JSON-serializable inputs and outputs,
+          registered in a typed catalog. Every call is auditable back to a
+          recommendation.</p>
+        <h5>Representative tools</h5>
+        <ul>
+          <li><code>get_sales(store_id, …)</code></li>
+          <li><code>get_inventory_position(store_id)</code></li>
+          <li><code>get_nearby_stores(store_id, max_distance_km)</code></li>
+          <li><code>get_trend(product_id)</code></li>
+        </ul>
+        <h5>Repository parts</h5>
+        <ul>
+          <li><code>ai-agents/retail_agents/tools.py</code></li>
+        </ul>
+        <h5>Invariant for the next layer</h5>
+        <p>No write path exists. No tool mutates state. The LLM cannot run SQL
+          or shell commands. Guardrails enforce the allow-list on every call.</p>
       </div>
     </div>
 
-    <div class="flow-arrow">▼</div>
-
-    <!-- Layer 4: Agents -->
-    <div class="layer" style="--layer-color: var(--c-agent)">
-      <div class="layer-label">
+    <!-- Layer 4 -->
+    <div class="layer-detail" style="--layer-color: var(--c-agent)">
+      <div class="side">
         <span class="n">Layer 4</span>
         <span class="t">Agentic AI</span>
-        <span class="d">Supervisor + 6 specialists</span>
+        <span class="tech">Supervisor + 6 specialists</span>
       </div>
-      <div class="nodes">
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">Supervisor</div>
-          <div class="sub">Plans · routes · validates · ranks</div>
-          <span class="tag">Orchestrator</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">RetailIntelligence</div>
-          <div class="sub">Store context + insights pack</div>
-          <span class="tag">Specialist</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">ProductRecommendation</div>
-          <div class="sub">Composite retail score · front office</div>
-          <span class="tag">Specialist</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">InventoryOptimization</div>
-          <div class="sub">Transfers · aging · replenishment</div>
-          <span class="tag">Specialist</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">PricingOptimization</div>
-          <div class="sub">Elastic markdowns above margin floor</div>
-          <span class="tag">Specialist</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">SalesForecasting</div>
-          <div class="sub">7-day target with seasonality</div>
-          <span class="tag">Specialist</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">StoreExecution</div>
-          <div class="sub">Priority · owners · deadlines</div>
-          <span class="tag">Specialist</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-agent)">
-          <div class="ttl">LLM provider</div>
-          <div class="sub">Pluggable · deterministic default</div>
-          <span class="tag">Adapter</span>
-        </div>
+      <div class="body">
+        <h5>What it is</h5>
+        <p>A deterministic, auditable orchestration. The Supervisor plans the
+          run, invokes <code>RetailIntelligenceAgent</code> first for context,
+          then dispatches the five scoring/decision specialists, dedupes
+          conflicts, and finally hands the ranked list to
+          <code>StoreExecutionAgent</code> to turn into a plan.</p>
+        <h5>Specialists</h5>
+        <ul>
+          <li><b>RetailIntelligence</b> — store context + insights pack.</li>
+          <li><b>ProductRecommendation</b> — composite retail score for front-office placement.</li>
+          <li><b>InventoryOptimization</b> — three concerns: transfers, aging, replenishment.</li>
+          <li><b>PricingOptimization</b> — elastic markdowns bounded by a hard margin floor.</li>
+          <li><b>SalesForecasting</b> — 7-day target with day-of-week seasonality.</li>
+          <li><b>StoreExecution</b> — prioritizes by <code>(priority, −expected_margin_impact)</code>.</li>
+        </ul>
+        <h5>Repository parts</h5>
+        <ul>
+          <li><code>ai-agents/retail_agents/supervisor.py</code></li>
+          <li><code>ai-agents/retail_agents/agents/*.py</code></li>
+          <li><code>ai-agents/retail_agents/llm_provider.py</code> — pluggable; deterministic default means no API key needed.</li>
+        </ul>
+        <h5>Invariant for the next layer</h5>
+        <p>Every recommendation carries evidence, scores, approval flag, and a
+          success KPI. The LLM shapes narrative only — it never alters metrics.</p>
       </div>
     </div>
 
-    <div class="flow-arrow">▼</div>
-
-    <!-- Layer 5: Guardrails -->
-    <div class="layer" style="--layer-color: var(--c-guard)">
-      <div class="layer-label">
+    <!-- Layer 5 -->
+    <div class="layer-detail" style="--layer-color: var(--c-guard)">
+      <div class="side">
         <span class="n">Layer 5</span>
         <span class="t">AI Guardrails</span>
-        <span class="d">NeMo or local policy engine · fail-closed</span>
+        <span class="tech">NeMo or local policy engine · fail-closed</span>
       </div>
-      <div class="nodes">
-        <div class="node" style="--node-color: var(--c-guard)">
-          <div class="ttl">Input policy</div>
-          <div class="sub">Validation · prompt-injection · PII · topic</div>
-          <span class="tag">Pre</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-guard)">
-          <div class="ttl">Tool policy</div>
-          <div class="sub">Allow-list · schema · read-only</div>
-          <span class="tag">Mid</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-guard)">
-          <div class="ttl">Output policy</div>
-          <div class="sub">Evidence · grounding · approval tag</div>
-          <span class="tag">Post</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-guard)">
-          <div class="ttl">Audit log</div>
-          <div class="sub">Append-only · decisions &amp; violations</div>
-          <span class="tag">Audit</span>
-        </div>
+      <div class="body">
+        <h5>What it is</h5>
+        <p>Three policy stages — Input, Tool, Output — plus an append-only
+          Audit Log. Each stage denies by default. If NVIDIA NeMo Guardrails is
+          installed, it runs the policies; otherwise the local engine enforces
+          the same contract.</p>
+        <h5>Policies</h5>
+        <ul>
+          <li><b>Input:</b> validation · prompt-injection detection · PII mask · topic restriction.</li>
+          <li><b>Tool:</b> allow-list · schema check · read-only enforcement.</li>
+          <li><b>Output:</b> evidence present · grounded to known IDs · approval tag correct for the action type.</li>
+          <li><b>Audit:</b> approvals, rejections, violations — immutable.</li>
+        </ul>
+        <h5>Repository parts</h5>
+        <ul>
+          <li><code>ai-guardrails/</code> — NeMo config + <code>service/guardrail_service.py</code> local engine.</li>
+          <li><code>ai-guardrails/tests/</code> — security tests.</li>
+        </ul>
+        <h5>Invariant for the next layer</h5>
+        <p>Anything the API receives has already been policy-validated and
+          grounded. Hallucinated IDs cannot reach the service layer.</p>
       </div>
     </div>
 
-    <div class="flow-arrow">▼</div>
-
-    <!-- Layer 6: API -->
-    <div class="layer" style="--layer-color: var(--c-api)">
-      <div class="layer-label">
+    <!-- Layer 6 -->
+    <div class="layer-detail" style="--layer-color: var(--c-api)">
+      <div class="side">
         <span class="n">Layer 6</span>
         <span class="t">ASP.NET Core Web API</span>
-        <span class="d">Clean Architecture · 4 projects</span>
+        <span class="tech">Clean Architecture · .NET 8</span>
       </div>
-      <div class="nodes">
-        <div class="node" style="--node-color: var(--c-api)">
-          <div class="ttl">Retail.Domain</div>
-          <div class="sub">Entities · value objects · invariants</div>
-          <span class="tag">Core</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-api)">
-          <div class="ttl">Retail.Application</div>
-          <div class="sub">Services · DTOs · FluentValidation</div>
-          <span class="tag">Use-cases</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-api)">
-          <div class="ttl">Retail.Infrastructure</div>
-          <div class="sub">Agent orchestrator · guardrail client · repos</div>
-          <span class="tag">Adapters</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-api)">
-          <div class="ttl">Retail.Api</div>
-          <div class="sub">Controllers · Swagger · Serilog · problem-details</div>
-          <span class="tag">HTTP</span>
-        </div>
+      <div class="body">
+        <h5>What it is</h5>
+        <p>Four-project Clean Architecture solution. The Infrastructure
+          project orchestrates the Python agent process and the guardrail
+          client. The Application project holds use-cases and validators. The
+          Domain project holds the invariants. The Api project is the HTTP
+          surface.</p>
+        <h5>Projects</h5>
+        <ul>
+          <li><code>Retail.Domain</code> — entities, value objects, invariants.</li>
+          <li><code>Retail.Application</code> — services, DTOs, FluentValidation.</li>
+          <li><code>Retail.Infrastructure</code> — agent orchestrator, guardrail client, in-memory recommendation repo.</li>
+          <li><code>Retail.Api</code> — controllers, Program, Swagger, Serilog, problem-details middleware.</li>
+        </ul>
+        <h5>Repository parts</h5>
+        <ul><li><code>api/Retail.sln</code> and the four project folders.</li></ul>
+        <h5>Invariant for the next layer</h5>
+        <p>Only the API writes to downstream systems, and only after an
+          approval record exists for the recommendation.</p>
       </div>
     </div>
 
-    <div class="flow-arrow">▼</div>
-
-    <!-- Layer 7: UI + HITL -->
-    <div class="layer" style="--layer-color: var(--c-ui)">
-      <div class="layer-label">
+    <!-- Layer 7 -->
+    <div class="layer-detail" style="--layer-color: var(--c-ui)">
+      <div class="side">
         <span class="n">Layer 7</span>
         <span class="t">Experience &amp; HITL</span>
-        <span class="d">React UI · HTML report · approvals</span>
+        <span class="tech">React 18 · TypeScript · Vite + HTML report</span>
       </div>
-      <div class="nodes">
-        <div class="node" style="--node-color: var(--c-ui)">
-          <div class="ttl">Executive dashboard</div>
-          <div class="sub">KPIs · trends · store selector</div>
-          <span class="tag">React 18</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-ui)">
-          <div class="ttl">Decision center</div>
-          <div class="sub">Agent trace · recommendation cards</div>
-          <span class="tag">React 18</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-ui)">
-          <div class="ttl">Daily game plan</div>
-          <div class="sub">Prioritized action list</div>
-          <span class="tag">React 18</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-ui)">
-          <div class="ttl">Standalone report</div>
-          <div class="sub">Printable, offline, theme-aware</div>
-          <span class="tag">HTML</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-human)">
-          <div class="ttl">Human approvals</div>
-          <div class="sub">Pricing · transfers · markdowns · replen</div>
-          <span class="tag">HITL</span>
-        </div>
-        <div class="node" style="--node-color: var(--c-human)">
-          <div class="ttl">Audited execution</div>
-          <div class="sub">C#-mediated · signed audit record</div>
-          <span class="tag">Execute</span>
-        </div>
+      <div class="body">
+        <h5>What it is</h5>
+        <p>Seven-page dashboard plus a printable standalone HTML report.
+          Managers see KPIs, the daily game plan, and the agent trace;
+          consequential actions (pricing, transfers, markdowns, replenishment)
+          require explicit approval, which is written to the append-only
+          audit log alongside the agent's evidence snapshot.</p>
+        <h5>UI pages</h5>
+        <ul>
+          <li>Executive dashboard, Product intelligence, Inventory optimization,
+            Pricing, Agent decision center, Daily game plan, Architecture.</li>
+        </ul>
+        <h5>Reusable components</h5>
+        <ul>
+          <li><code>KpiTile</code> · <code>RecommendationCard</code> · <code>StoreSelector</code></li>
+        </ul>
+        <h5>Repository parts</h5>
+        <ul>
+          <li><code>ui/</code> — React source; API client at <code>ui/src/services/api.ts</code>.</li>
+          <li><code>reports/generate_report.py</code> → <code>reports/daily-store-decision-report.html</code>.</li>
+        </ul>
+        <h5>Invariant upheld</h5>
+        <p>No consequential write happens without a logged human approval.</p>
       </div>
     </div>
 
   </div>
 
-  <!-- ============ 2. HOW THE AGENT DECIDES ============ -->
-  <h2><span class="num">2</span>How the agent decides</h2>
+  <!-- ============ 4. HOW THE AGENT DECIDES ============ -->
+  <h2 id="decides"><span class="num">7</span>How the agent decides</h2>
   <p class="lead">
-    The supervisor runs a deterministic, auditable pipeline. The LLM — when
+    The Supervisor runs a deterministic, auditable pipeline. The LLM — when
     configured — only shapes narrative on top of the deterministic result; it
-    never alters metrics, scores, or approval requirements. This is the heart
-    of the system.
+    never alters metrics, scores, or approval requirements.
   </p>
 
   <div class="decision">
     <div class="pipe">
       <div class="stage" style="--stage-color: var(--c-src)">
-        <div class="icon">1</div>
-        <div class="t">Request</div>
+        <div class="icon">1</div><div class="t">Request</div>
         <div class="d"><code>store_id</code> + intent</div>
       </div>
       <div class="arrow">›</div>
       <div class="stage" style="--stage-color: var(--c-guard)">
-        <div class="icon">2</div>
-        <div class="t">Input gate</div>
+        <div class="icon">2</div><div class="t">Input gate</div>
         <div class="d">Validate &amp; sanitize</div>
       </div>
       <div class="arrow">›</div>
       <div class="stage" style="--stage-color: var(--c-tool)">
-        <div class="icon">3</div>
-        <div class="t">Insights pack</div>
+        <div class="icon">3</div><div class="t">Insights pack</div>
         <div class="d">Tool-only data pull</div>
       </div>
       <div class="arrow">›</div>
       <div class="stage" style="--stage-color: var(--c-agent)">
-        <div class="icon">4</div>
-        <div class="t">Specialists</div>
+        <div class="icon">4</div><div class="t">Specialists</div>
         <div class="d">Score &amp; propose</div>
       </div>
     </div>
-
     <div style="height:10px"></div>
-
     <div class="pipe">
       <div class="stage" style="--stage-color: var(--c-guard)">
-        <div class="icon">5</div>
-        <div class="t">Output gate</div>
+        <div class="icon">5</div><div class="t">Output gate</div>
         <div class="d">Grounding &amp; evidence</div>
       </div>
       <div class="arrow">›</div>
       <div class="stage" style="--stage-color: var(--c-agent)">
-        <div class="icon">6</div>
-        <div class="t">Dedupe &amp; rank</div>
+        <div class="icon">6</div><div class="t">Dedupe &amp; rank</div>
         <div class="d">Conflict resolution</div>
       </div>
       <div class="arrow">›</div>
       <div class="stage" style="--stage-color: var(--c-agent)">
-        <div class="icon">7</div>
-        <div class="t">Action plan</div>
+        <div class="icon">7</div><div class="t">Action plan</div>
         <div class="d">Priority · owner · deadline</div>
       </div>
       <div class="arrow">›</div>
       <div class="stage" style="--stage-color: var(--c-human)">
-        <div class="icon">8</div>
-        <div class="t">Approve &amp; act</div>
+        <div class="icon">8</div><div class="t">Approve &amp; act</div>
         <div class="d">HITL + audited execution</div>
       </div>
     </div>
 
-    <!-- Scoring explainer -->
     <div class="scoring">
       <div class="card">
         <h4>Composite retail score — ProductRecommendationAgent</h4>
         <p style="margin:0 0 8px; font-size:13px; color:var(--muted)">
           Each candidate product is scored across five normalized factors; the
           weighted sum ranks front-office placement candidates. Weights are
-          configurable, deliberately avoiding over-reliance on any one signal.
+          configurable, deliberately avoiding over-reliance on any single signal.
         </p>
-        <div class="formula">
-score = 0.30·velocity + 0.25·margin + 0.20·demand
-      + 0.15·sentiment + 0.10·availability
-        </div>
+        <div class="formula">score = 0.30·velocity + 0.25·margin + 0.20·demand
+      + 0.15·sentiment + 0.10·availability</div>
         <ul class="weights" aria-label="scoring weights">
           <li><b>Velocity</b><span class="bar"><span style="width:30%"></span></span><span>0.30</span></li>
           <li><b>Margin</b><span class="bar"><span style="width:25%"></span></span><span>0.25</span></li>
@@ -1036,8 +1180,8 @@ score = 0.30·velocity + 0.25·margin + 0.20·demand
     </div>
   </div>
 
-  <!-- ============ 3. END-TO-END NARRATIVE ============ -->
-  <h2><span class="num">3</span>End-to-end flow — what happens on one run</h2>
+  <!-- ============ 5. END-TO-END FLOW ============ -->
+  <h2 id="flow"><span class="num">8</span>End-to-end flow — what happens on one run</h2>
   <p class="lead">
     A single call to <code>python -m retail_agents.supervisor S101</code> — or
     one <code>POST /api/stores/{id}/recommendations</code> — exercises the
@@ -1048,119 +1192,75 @@ score = 0.30·velocity + 0.25·margin + 0.20·demand
     <article class="step">
       <h3>Ingest to Bronze</h3>
       <p>POS, inventory, returns, surveys, and external feeds land in
-        <code>bronze.*</code> Delta tables with ingest timestamps. No business logic
-        at this layer — just typed capture.</p>
+        <code>bronze.*</code> Delta tables with ingest timestamps.</p>
       <div class="meta"><b>In:</b> source systems <b>Out:</b> <code>bronze.*</code></div>
     </article>
-
     <article class="step">
       <h3>Conform to Silver</h3>
-      <p>De-duplicate, cast types, resolve late-arriving data, apply reference
-        joins (store, product dim). Data quality expectations attach here as
-        delta constraints.</p>
+      <p>De-duplicate, cast types, resolve late-arriving data, apply reference joins.</p>
       <div class="meta"><b>In:</b> <code>bronze.*</code> <b>Out:</b> <code>silver.*</code></div>
     </article>
-
     <article class="step">
       <h3>Aggregate to Gold features</h3>
-      <p>Build serving tables for agents:
-        <code>agg_product_sales_features</code>,
-        <code>agg_inventory_features</code>,
-        <code>agg_store_performance_90d</code>,
-        <code>product_trend</code>.</p>
+      <p>Build serving tables for agents.</p>
       <div class="meta"><b>Switch:</b> Databricks SQL / local CSV via <code>RetailDataStore</code></div>
     </article>
-
     <article class="step">
       <h3>Supervisor plans the run</h3>
-      <p>Receives a store id. Runs the input guardrail. Loads the insights
-        pack via <code>RetailIntelligenceAgent</code>. Decides which
-        specialists to call and in what order — intelligence first, execution
-        last.</p>
+      <p>Receives a store id. Runs the input guardrail. Loads the insights pack via <code>RetailIntelligenceAgent</code>. Decides which specialists to call.</p>
       <div class="meta"><b>Policy:</b> fail-closed on any input violation</div>
     </article>
-
     <article class="step">
       <h3>Specialists emit candidates</h3>
-      <p>Each specialist produces evidence-bearing candidates:
-        composite score, expected revenue + margin impact, risk,
-        confidence, success KPI, and whether human approval is required.
-        All data reads flow through <code>ToolRegistry</code>.</p>
-      <div class="meta"><b>Determinism:</b> no LLM API key needed to run end-to-end</div>
+      <p>Each specialist produces evidence-bearing candidates with score, expected revenue + margin impact, risk, confidence, success KPI, and approval flag.</p>
+      <div class="meta"><b>Determinism:</b> no LLM key needed to run end-to-end</div>
     </article>
-
     <article class="step">
       <h3>Guardrails validate every output</h3>
-      <p>Each candidate passes the output policy: evidence present,
-        grounded to real store/product IDs, approval flag correct for
-        the action type. Rejections are recorded in the agent trace
-        with reason — never silently dropped.</p>
+      <p>Each candidate passes the output policy: evidence present, grounded to real IDs, approval flag correct.</p>
       <div class="meta"><b>Audit:</b> append-only; verdict + reason + evidence hash</div>
     </article>
-
     <article class="step">
       <h3>Dedupe &amp; rank</h3>
-      <p>Supervisor collapses conflicts (e.g. one pricing action per product,
-        keeping the one with the greater margin impact), then ranks by
-        priority and expected margin impact.</p>
+      <p>Collapses conflicts (one pricing action per product, keeping the greater margin impact), ranks by priority and margin impact.</p>
       <div class="meta"><b>Out:</b> deduped recommendation list</div>
     </article>
-
     <article class="step">
       <h3>Build the action plan</h3>
-      <p><code>StoreExecutionAgent</code> turns ranked recommendations into
-        numbered actions with owners, deadlines (<code>deadline_hours</code>),
-        and success KPIs — the manager's single pane of work for the day.</p>
+      <p><code>StoreExecutionAgent</code> turns ranked recommendations into numbered actions with owners, deadlines, and success KPIs.</p>
       <div class="meta"><b>Sort:</b> <code>(priority, -expected_margin_impact)</code></div>
     </article>
-
     <article class="step">
       <h3>API serves the bundle</h3>
-      <p>The .NET Infrastructure project orchestrates the Python agent run,
-        validates the DTO with FluentValidation, logs via Serilog, and
-        surfaces errors as RFC 7807 problem-details through a controller.</p>
+      <p>Infrastructure orchestrates the Python run, validates the DTO, logs via Serilog, surfaces errors as RFC 7807 problem-details.</p>
       <div class="meta"><b>Entity:</b> <code>RecommendationBundle</code></div>
     </article>
-
     <article class="step">
       <h3>UI and report present the plan</h3>
-      <p>React pages render KPIs, agent trace, and recommendation cards.
-        The standalone HTML report mirrors the UI for print/offline review.</p>
+      <p>React pages render KPIs, agent trace, and recommendation cards; the standalone HTML report mirrors it for print/offline.</p>
       <div class="meta"><b>Components:</b> <code>KpiTile</code> · <code>RecommendationCard</code> · <code>StoreSelector</code></div>
     </article>
-
     <article class="step">
       <h3>Human approves consequential actions</h3>
-      <p>Pricing, transfers, markdowns, and replenishment require explicit
-        manager approval. Both approvals and rejections are written to the
-        append-only audit log with user, timestamp, reason, and the
-        evidence snapshot the agent used.</p>
+      <p>Pricing, transfers, markdowns, and replenishment require explicit manager approval, written to the append-only audit log.</p>
       <div class="meta"><b>HITL gate:</b> no consequential write without an approval record</div>
     </article>
-
     <article class="step">
       <h3>Audited execution &amp; feedback</h3>
-      <p>Only the C# service executes — never the LLM or the agents. Adapters
-        push approved actions to ERP, pricing engine, or WMS; every call is
-        tied back to the recommendation id. Realized outcomes flow into
-        Bronze on the next ingest, closing the loop plan → act → measure.</p>
+      <p>Only the C# service executes. Adapters push approved actions to downstream systems. Realized outcomes flow into Bronze on the next ingest.</p>
       <div class="meta"><b>Invariant:</b> no write path from LLM</div>
     </article>
   </div>
 
-  <!-- ============ 4. ACTION PLAN CONTRACT ============ -->
-  <h2><span class="num">4</span>Action plan — the manager's contract</h2>
+  <!-- ============ 6. ACTION PLAN CONTRACT ============ -->
+  <h2 id="contract"><span class="num">9</span>Action plan — the manager's contract</h2>
   <p class="lead">
-    What the <code>StoreExecutionAgent</code> emits for each row of the daily
-    plan. Every field is required and every value is evidence-backed.
+    What <code>StoreExecutionAgent</code> emits for each row of the daily plan.
+    Every field is required and every value is evidence-backed.
   </p>
 
   <table class="std">
-    <thead>
-      <tr>
-        <th>Field</th><th>Meaning</th><th>Example</th>
-      </tr>
-    </thead>
+    <thead><tr><th>Field</th><th>Meaning</th><th>Example</th></tr></thead>
     <tbody>
       <tr><td><code>sequence</code></td><td>Rank in the day's plan</td><td>1</td></tr>
       <tr><td><code>recommendation_id</code></td><td>Traceable id back to the agent trace</td><td><code>REC-2026-11-03-S101-004</code></td></tr>
@@ -1170,19 +1270,19 @@ score = 0.30·velocity + 0.25·margin + 0.20·demand
       <tr><td><code>owner</code></td><td>Responsible role</td><td>Store Manager · Regional Pricing</td></tr>
       <tr><td><code>deadline_hours</code></td><td>Time-to-act</td><td>24</td></tr>
       <tr><td><code>expected_sales_impact</code></td><td>Projected revenue uplift</td><td>$3,420</td></tr>
-      <tr><td><code>expected_margin_impact</code></td><td>Projected margin uplift (net of cost)</td><td>$1,312</td></tr>
+      <tr><td><code>expected_margin_impact</code></td><td>Projected margin uplift</td><td>$1,312</td></tr>
       <tr><td><code>success_kpi</code></td><td>How we'll know it worked</td><td>Sell-through ≥ 70% in 7 days</td></tr>
       <tr><td><code>requires_approval</code></td><td>Gated by HITL?</td><td>true</td></tr>
       <tr><td><code>status</code></td><td>Lifecycle state</td><td>PROPOSED · APPROVED · REJECTED · EXECUTED</td></tr>
     </tbody>
   </table>
 
-  <!-- ============ 5. TRUST BOUNDARIES ============ -->
-  <h2><span class="num">5</span>Trust &amp; safety boundaries</h2>
+  <!-- ============ 7. TRUST ============ -->
+  <h2 id="trust"><span class="num">10</span>Trust &amp; safety boundaries</h2>
   <div class="grid3">
     <div class="box">
       <h4>Agents can't touch data directly</h4>
-      <p>All data access flows through <code>ToolRegistry</code> — typed, read-only, allow-listed by the guardrail layer.</p>
+      <p>All data access flows through <code>ToolRegistry</code> — typed, read-only, allow-listed.</p>
     </div>
     <div class="box">
       <h4>No write path from the LLM</h4>
@@ -1190,44 +1290,127 @@ score = 0.30·velocity + 0.25·margin + 0.20·demand
     </div>
     <div class="box">
       <h4>Fail-closed guardrails</h4>
-      <p>Input, tool, and output policies deny by default. Any violation is logged with full context.</p>
+      <p>Input, tool, and output policies deny by default. Violations logged with full context.</p>
     </div>
     <div class="box">
       <h4>Grounding on known IDs</h4>
-      <p>Every recommendation must reference real <code>store_id</code> / <code>product_id</code> seen in Gold; hallucinated IDs are rejected.</p>
+      <p>Every recommendation must reference real <code>store_id</code> / <code>product_id</code> seen in Gold.</p>
     </div>
     <div class="box">
       <h4>Append-only audit</h4>
-      <p>Approvals, rejections, policy violations, and executed actions are immutable and reconstructible.</p>
+      <p>Approvals, rejections, violations, and executed actions are immutable and reconstructible.</p>
     </div>
     <div class="box">
       <h4>Deterministic by default</h4>
-      <p>No LLM API key? The deterministic specialists still produce the full action plan — the LLM only shapes narrative.</p>
+      <p>No LLM API key? The deterministic specialists still produce the full plan — the LLM only shapes narrative.</p>
     </div>
   </div>
 
-  <!-- ============ 6. OPERATE ============ -->
-  <h2><span class="num">6</span>Operate</h2>
+  <!-- ============ 8. BUSINESS SCENARIOS ============ -->
+  <h2 id="scenarios"><span class="num">11</span>Business scenarios — what a store manager sees</h2>
+  <p class="lead">
+    Six concrete decisions the platform makes on a typical day, with the
+    agent that produced them and a representative output.
+  </p>
+
+  <table class="std">
+    <thead>
+      <tr><th>#</th><th>Scenario</th><th>Agent</th><th>Example output</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td><td>Front-office placement</td>
+        <td>ProductRecommendation</td>
+        <td>"Feature North Trail Hiking Boots in the front display — composite score 0.89, 12 units/wk, 48% margin, 0.72 demand signal."</td>
+      </tr>
+      <tr>
+        <td>2</td><td>Inter-store transfer</td>
+        <td>InventoryOptimization</td>
+        <td>"Transfer 54 units from S102 to S101 — destination 16.9/wk velocity, 13 on hand; source 9.4/wk velocity, 159 on hand (17 wk cover)."</td>
+      </tr>
+      <tr>
+        <td>3</td><td>Aging inventory</td>
+        <td>InventoryOptimization</td>
+        <td>"Age 180+, margin 46.8% — recommend 15% markdown with regional approval."</td>
+      </tr>
+      <tr>
+        <td>4</td><td>Pricing</td>
+        <td>PricingOptimization</td>
+        <td>"Decrease price 5% — weeks-of-cover 12, margin 42%; projected margin 37.1% stays above 10% floor."</td>
+      </tr>
+      <tr>
+        <td>5</td><td>Daily game plan</td>
+        <td>StoreExecution</td>
+        <td>Prioritized list ordered by priority and margin impact.</td>
+      </tr>
+      <tr>
+        <td>6</td><td>Sales target</td>
+        <td>SalesForecasting</td>
+        <td>"Set 7-day target to $112,340 (+5% stretch) based on day-of-week seasonal forecast."</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 9. OPERATE / QUICK START ============ -->
+  <h2 id="operate"><span class="num">12</span>Quick start &amp; operate</h2>
+  <p class="lead">
+    Run the whole stack locally. The Python half runs with no cloud account;
+    the C# API and React UI need .NET 8 and Node 20.
+  </p>
+
+  <h3 style="margin-top:18px">1. Generate deterministic sample data</h3>
+  <pre class="code">python databricks/generate_sample_data.py
+<span class="cmt"># 50 products × 5 stores × 90 days → 17,369 sales / 250 inventory snapshots / 1,024 surveys</span></pre>
+
+  <h3 style="margin-top:18px">2. Produce the standalone HTML decision report</h3>
+  <pre class="code">python reports/generate_report.py S101
+<span class="cmt"># → reports/daily-store-decision-report.html (styled, 38 action cards)</span></pre>
+
+  <h3 style="margin-top:18px">3. End-to-end agent run (no API, no UI)</h3>
+  <pre class="code">PYTHONPATH=ai-agents python -m retail_agents.supervisor S101
+<span class="cmt"># Returns a RecommendationBundle JSON — agent trace, action plan, 38 recommendations.</span></pre>
+
+  <h3 style="margin-top:18px">4. Run the test suite</h3>
+  <pre class="code">python -m pytest
+<span class="cmt"># 26/26 passing — agents, guardrails, sample data.</span></pre>
+
+  <h3 style="margin-top:18px">5. Boot the full stack</h3>
+  <pre class="code"><span class="cmt"># API</span>
+cd api &amp;&amp; dotnet run --project Retail.Api --urls http://localhost:5080
+
+<span class="cmt"># UI (in a second shell)</span>
+cd ui &amp;&amp; npm install &amp;&amp; npm run dev
+<span class="cmt"># → open http://localhost:5173</span></pre>
+
+  <h3 style="margin-top:28px">Further documentation</h3>
   <div class="grid3">
     <div class="box">
-      <h4>Run end-to-end locally</h4>
-      <p>No API, no UI — straight to the bundle:</p>
-      <p style="margin-top:8px"><span class="kbd">PYTHONPATH=ai-agents python -m retail_agents.supervisor S101</span></p>
+      <h4>In <code>docs/</code></h4>
+      <ul>
+        <li><code>architecture.md</code> · <code>architecture-diagram.html</code></li>
+        <li><code>data-dictionary.md</code></li>
+        <li><code>api-specification.md</code></li>
+        <li><code>agent-design.md</code></li>
+        <li><code>security-design.md</code></li>
+        <li><code>business-rules.md</code></li>
+        <li><code>deployment-guide.md</code></li>
+      </ul>
     </div>
     <div class="box">
-      <h4>Generate the printable report</h4>
-      <p><span class="kbd">python reports/generate_report.py S101</span></p>
-      <p style="margin-top:4px">→ <code>reports/daily-store-decision-report.html</code></p>
+      <h4>Environment constraints during the reference build</h4>
+      <p>The Python stack (data, agents, guardrails, report, tests) runs on
+         the build host; the C# API and React UI are complete source trees
+         that require .NET 8 SDK and Node.js 20 to build and run — see
+         <code>docs/deployment-guide.md</code>.</p>
     </div>
     <div class="box">
-      <h4>Boot the stack</h4>
-      <p>API: <span class="kbd">dotnet run --project api/Retail.Api --urls http://localhost:5080</span></p>
-      <p style="margin-top:4px">UI: <span class="kbd">cd ui &amp;&amp; npm run dev</span> → <code>http://localhost:5173</code></p>
-    </div>
-    <div class="box">
-      <h4>Tests</h4>
-      <p><span class="kbd">python -m pytest</span></p>
-      <p style="margin-top:4px">Covers agents, guardrails, and sample data generation.</p>
+      <h4>Verified during the reference build</h4>
+      <ul>
+        <li><code>generate_sample_data.py</code> → deterministic dataset.</li>
+        <li><code>supervisor S101</code> → 38 recommendations.</li>
+        <li><code>generate_report.py S101</code> → styled HTML report.</li>
+        <li><code>pytest</code> → 26 / 26 passing.</li>
+      </ul>
     </div>
   </div>
 
